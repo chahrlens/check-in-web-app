@@ -36,8 +36,7 @@ class ResponsiveSidebarLayout extends StatelessWidget {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Get.offAllNamed(RouteConstants.login);
         });
-        return const SizedBox
-            .shrink(); // Return an empty widget while redirecting
+        return const SizedBox.shrink(); // Return an empty widget while redirecting
       }
 
       return LayoutBuilder(
@@ -52,8 +51,9 @@ class ResponsiveSidebarLayout extends StatelessWidget {
                       return IconButton(
                         icon: const Icon(Icons.menu, color: Colors.white),
                         onPressed: () {
-                          Scaffold.of(context)
-                              .openDrawer(); // Abre el menú lateral
+                          Scaffold.of(
+                            context,
+                          ).openDrawer(); // Abre el menú lateral
                         },
                       );
                     },
@@ -112,8 +112,10 @@ class ResponsiveSidebarLayout extends StatelessWidget {
                     Text(title, style: CustomStyle.layoutTitleText(context)),
                     const SizedBox(height: 4),
                     if (description.isNotEmpty)
-                      Text(description,
-                          style: CustomStyle.layoutDescriptionText(context)),
+                      Text(
+                        description,
+                        style: CustomStyle.layoutDescriptionText(context),
+                      ),
                   ],
                 ),
               ),
@@ -140,9 +142,7 @@ class ResponsiveSidebarLayout extends StatelessWidget {
                         child: Column(
                           children: [
                             appBar,
-                            Expanded(
-                              child: stackedContent,
-                            ),
+                            Expanded(child: stackedContent),
                           ],
                         ),
                       ),
@@ -189,7 +189,11 @@ class WavePainter extends CustomPainter {
     final path = Path();
     path.lineTo(0, size.height * 0.8);
     path.quadraticBezierTo(
-        size.width / 2, size.height, size.width, size.height * 0.8);
+      size.width / 2,
+      size.height,
+      size.width,
+      size.height * 0.8,
+    );
     path.lineTo(size.width, 0);
     path.close();
 
@@ -198,4 +202,85 @@ class WavePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class ResponsiveSimpleLayout extends StatelessWidget {
+  final Widget content;
+  final String title;
+  final String description;
+  final bool showBackButton;
+
+  const ResponsiveSimpleLayout({
+    super.key,
+    required this.content,
+    required this.title,
+    this.description = "",
+    this.showBackButton = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final appBar = AppBar(
+          leading: showBackButton
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              : null,
+          backgroundColor: colorScheme.primary,
+          elevation: 0.5,
+          automaticallyImplyLeading: false,
+          iconTheme: IconThemeData(color: colorScheme.surface),
+        );
+
+        Widget backgroundWave = SizedBox(
+          height: constraints.maxHeight * 0.4,
+          width: double.infinity,
+          child: CustomPaint(painter: WavePainter(color: colorScheme.primary)),
+        );
+
+        Widget stackedContent = Stack(
+          children: [
+            Positioned.fill(
+              child: Column(
+                children: [
+                  backgroundWave,
+                  Expanded(child: Container()),
+                ],
+              ),
+            ),
+            Positioned(
+              top: -10,
+              left: 58,
+              right: 24,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: CustomStyle.layoutTitleText(context)),
+                  const SizedBox(height: 4),
+                  if (description.isNotEmpty)
+                    Text(
+                      description,
+                      style: CustomStyle.layoutDescriptionText(context),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: constraints.maxHeight * 0.09),
+              child: SizedBox(width: double.infinity, child: content),
+            ),
+          ],
+        );
+
+        return Scaffold(appBar: appBar, body: stackedContent);
+      },
+    );
+  }
 }

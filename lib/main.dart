@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: GetMaterialApp(
-        initialRoute: RouteConstants.login,
+        initialRoute: RouteConstants.checkIn,
         navigatorObservers: [routeObserver],
         title: 'Qr Check In',
         debugShowCheckedModeBanner: false,
