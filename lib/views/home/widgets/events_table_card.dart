@@ -40,17 +40,17 @@ class EventsTableCard extends StatelessWidget {
         tableRows: controller.events
             .asMap()
             .map(
-              (index, value) => MapEntry(
+              (index, item) => MapEntry(
                 index,
                 DataRow(
                   cells: [
-                    cell(value.id.toString().padLeft(4, '0'), context),
-                    cell(value.host.fullName, context),
-                    cell(value.description, context),
-                    cell(value.totalSpaces.toString(), context),
-                    cell(value.tableCount.toString(), context),
-                    cell(value.reservationCount.toString(), context),
-                    cell(value.eventDate.toLocal().toString(), context),
+                    cell(item.id.toString().padLeft(4, '0'), context),
+                    cell(item.host.fullName, context),
+                    cell(item.description, context),
+                    cell(item.totalSpaces.toString(), context),
+                    cell(item.tableCount.toString(), context),
+                    cell(item.reservationCount.toString(), context),
+                    cell(item.eventDate.toLocal().toString(), context),
                     DataCell(
                       Row(
                         children: [
@@ -67,7 +67,7 @@ class EventsTableCard extends StatelessWidget {
                             onPressed: () {
                               Get.toNamed(
                                 RouteConstants.manageEvent,
-                                arguments: {'isEdit': true, 'data': value},
+                                arguments: {'isEdit': true, 'data': item},
                               );
                             },
                           ),
@@ -125,7 +125,17 @@ class EventsTableCard extends StatelessWidget {
                               ),
                             ],
                             onSelected: (value) {
-                              // Maneja la acción seleccionada
+                              if (value == 1) {
+                                Get.toNamed(
+                                  RouteConstants.manageEvent,
+                                  arguments: {'data': item, 'isEdit': true},
+                                );
+                              } else if (value == 2) {
+                                Get.toNamed(
+                                  RouteConstants.manageGuests,
+                                  arguments: {'data': item},
+                                );
+                              }
                             },
                           ),
                         ],

@@ -1,11 +1,9 @@
-
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_check_in/theme/color_pallete.dart';
 import '../buttons/custom_elevation_button.dart';
 import 'package:qr_check_in/shared/resources/custom_style.dart';
-
-
 
 DataCell cellDataTable(
   dynamic element, {
@@ -25,7 +23,7 @@ DataCell cellDataTable(
     Text(
       element != null ? element.toString() : defaultValue,
       overflow: TextOverflow.ellipsis,
-      style: _fontStyleError(context,hasError),
+      style: _fontStyleError(context, hasError),
     ),
   );
 }
@@ -83,9 +81,7 @@ DataCell _longString(String element, bool? hasError, BuildContext context) {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 6,
-                                ),
+                                const SizedBox(height: 6),
                                 Align(
                                   alignment: Alignment.topRight,
                                   child: ToolTipButton(
@@ -95,9 +91,7 @@ DataCell _longString(String element, bool? hasError, BuildContext context) {
                                     icon: Icons.copy,
                                     onPressed: () async {
                                       await Clipboard.setData(
-                                        ClipboardData(
-                                          text: element.toString(),
-                                        ),
+                                        ClipboardData(text: element.toString()),
                                       );
                                     },
                                   ),
@@ -130,15 +124,15 @@ DataCell _longString(String element, bool? hasError, BuildContext context) {
   );
 }
 
-TextStyle _fontStyleError(BuildContext context, bool? hasError) =>
-  TextStyle(
-      color: hasError == true ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onSurface,
-      fontWeight: FontWeight.w400
-      );
+TextStyle _fontStyleError(BuildContext context, bool? hasError) => TextStyle(
+  color: hasError == true
+      ? Theme.of(context).colorScheme.error
+      : Theme.of(context).colorScheme.onSurface,
+  fontWeight: FontWeight.w400,
+);
 
-  WidgetStateProperty<Color> colorRowDataTable(int index, BuildContext context) {
-    return WidgetStateProperty.all<Color>(
-      index % 2 == 0 ? Theme.of(context).colorScheme.surfaceContainerHighest : Theme.of(context).colorScheme.onSecondaryFixedVariant,
-    );
-  }
-
+WidgetStateProperty<Color> colorRowDataTable(int index, BuildContext context) {
+  return WidgetStateProperty.all<Color>(
+    index % 2 == 0 ? AppColors.background : AppColors.surface,
+  );
+}

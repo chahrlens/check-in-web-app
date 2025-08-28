@@ -51,22 +51,14 @@ final ThemeData appTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primary,
       foregroundColor: AppColors.onPrimary,
-      textStyle: const TextStyle(
-        fontSize: 16,
-        color: AppColors.onPrimary,
-      ),
+      textStyle: const TextStyle(fontSize: 16, color: AppColors.onPrimary),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: AppColors.onPrimary,
-      textStyle: const TextStyle(
-        fontSize: 16,
-        color: AppColors.onPrimary,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      textStyle: const TextStyle(fontSize: 16, color: AppColors.onPrimary),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     ),
   ),
