@@ -4,7 +4,7 @@ import 'package:qr_check_in/widgets/layout/content_card.dart';
 import 'package:qr_check_in/widgets/commons/fixed_container.dart';
 import 'package:qr_check_in/widgets/layout/responsive_layout.dart';
 import 'package:qr_check_in/views/manage_event/widgets/event_form.dart';
-import 'package:qr_check_in/views/manage_event/widgets/modal_table_form.dart';
+import 'package:qr_check_in/views/manage_event/widgets/table_list_widget.dart';
 import 'package:qr_check_in/views/manage_event/controllers/event_controller.dart';
 
 class ManageEventPage extends StatefulWidget {
@@ -49,38 +49,39 @@ class _ManageEventPageState extends State<ManageEventPage> {
                     maxWidth: double.infinity,
                     minWidth: 0.0,
                     minHeight: 100,
-                    child: Wrap(
-                      children: [
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                          ),
-                          onPressed: () {
-                            if (!_formKey.currentState!.validate()) {
-                              Get.snackbar(
-                                'Error',
-                                'Por favor completa todos los campos requeridos para continuar.',
-                              );
-                              _controller.autovalidateMode = true;
-                              _controller.update();
-                              return;
-                            }
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              barrierLabel: 'Agregar mesa',
-                              builder: (BuildContext context) {
-                                return Dialog(child: ModalTableForm());
-                              },
-                            );
-                          },
-                          icon: Icon(Icons.add),
-                          label: Text('Agregar mesa'),
-                        ),
-                      ],
-                    ),
+                    child: TableListWidget(formKey: _formKey),
                   ),
                 ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                        ),
+                        onPressed: () {
+                          if (!_formKey.currentState!.validate()) {
+                            Get.snackbar(
+                              'Error',
+                              'Por favor completa todos los campos requeridos para continuar.',
+                            );
+                            _controller.autovalidateMode = true;
+                            _controller.update();
+                            return;
+                          }
+                          _controller.saveData();
+                        },
+                        icon: const Icon(Icons.save),
+                        label: Text('Guardar'),
+                      ),
+                      const SizedBox(width: 48 * 2),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
               ],
             ),
           );

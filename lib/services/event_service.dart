@@ -30,4 +30,70 @@ class EventService extends BaseService {
       );
     }
   }
+
+  Future<ApiResponse> createEvent({required EventModel data}) async {
+    try {
+      final body = data.toJson();
+      final response = await httpClient.post(
+        buildUri('/event/v1/events'),
+        body: json.encode(body),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final apiResponse = ApiResponse.fromResponse(response);
+      return apiResponse;
+    } catch (e) {
+      debugLog(e.toString());
+      return ApiResponse(
+        statusCode: 500,
+        success: false,
+        message: 'An error occurred',
+      );
+    }
+  }
+
+  Future<ApiResponse> updateEvent({required EventModel data}) async {
+    try {
+      final body = data.toPutJson();
+      final response = await httpClient.put(
+        buildUri('/event/v1/events'),
+        body: json.encode(body),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final apiResponse = ApiResponse.fromResponse(response);
+      return apiResponse;
+    } catch (e) {
+      debugLog(e.toString());
+      return ApiResponse(
+        statusCode: 500,
+        success: false,
+        message: 'An error occurred',
+      );
+    }
+  }
+
+  Future<ApiResponse> addEventTables({
+    required int eventId,
+    required List<EventTable> data,
+  }) async {
+    try {
+      final jsonData = {
+        'eventId': eventId,
+        "tablesData": data.map((e) => e.toJson()).toList(),
+      };
+      final response = await httpClient.post(
+        buildUri('/event/v1/events/$eventId/tables'),
+        body: json.encode(jsonData),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final apiResponse = ApiResponse.fromResponse(response);
+      return apiResponse;
+    } catch (e) {
+      debugLog(e.toString());
+      return ApiResponse(
+        statusCode: 500,
+        success: false,
+        message: 'An error occurred',
+      );
+    }
+  }
 }

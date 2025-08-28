@@ -23,7 +23,7 @@ class EventModel {
     required this.eventDate,
     required this.status,
     required this.createdAt,
-    required this.updatedAt,
+    this.updatedAt,
     required this.host,
     required this.eventTables,
     required this.reservations,
@@ -58,8 +58,47 @@ class EventModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      "hostData": host.toJson(),
+      "eventData": {
+        "name": name,
+        "description": description,
+        "totalSpaces": totalSpaces,
+        "eventDate": eventDate.toIso8601String(),
+      },
+      "tablesData": eventTables.map((table) => table.toJson()).toList(),
+    };
+  }
+
+  Map<String, dynamic> tableUpdateJson() {
+    return {
+      "eventId": id,
+      "tablesData": eventTables.map((table) => table.toJson()).toList(),
+    };
+  }
+
+  Map<String, dynamic> toPutJson() {
+    return {
+      "eventId": id,
+      "hostId": host.id,
+      "hostData": host.toJson(),
+      "eventData": {
+        "name": name,
+        "description": description,
+        "totalSpaces": totalSpaces,
+        "eventDate": eventDate.toIso8601String(),
+      },
+      "tablesData": eventTables
+          .where((e) => e.id == 0)
+          .map((e) => e.toJson())
+          .toList(),
+    };
+  }
+
   int get tableCount => eventTables.length;
-  int get reservationCount => reservations.fold(0, (sum, r) => sum + r.numCompanions);
+  int get reservationCount =>
+      reservations.fold(0, (sum, r) => sum + r.numCompanions);
 }
 
 class Host {
@@ -82,7 +121,7 @@ class Host {
     required this.nit,
     required this.phone,
     required this.createdAt,
-    required this.updatedAt,
+    this.updatedAt,
   });
 
   factory Host.fromJson(Map<String, dynamic> json) {
@@ -100,6 +139,18 @@ class Host {
           : null,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "firstName": firstName,
+      "lastName": lastName,
+      "role": role,
+      "dpi": dpi,
+      "nit": nit,
+      "phone": phone,
+    };
+  }
+
   String get fullName => '$firstName $lastName';
 }
 
@@ -140,6 +191,26 @@ class EventTable {
           ? DateTime.tryParse(json['updated_at'])
           : null,
     );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EventTable &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name.hashCode == name.hashCode &&
+          tableNumber == other.tableNumber;
+  @override
+  int get hashCode => id.hashCode ^ name.hashCode ^ tableNumber.hashCode;
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "description": description,
+      "tableNumber": tableNumber,
+      "capacity": capacity,
+    };
   }
 }
 

@@ -1,16 +1,202 @@
-import 'package:flutter/cupertino.dart';
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
+import 'package:flutter/widgets.dart';
 import 'package:qr_check_in/models/event_model.dart';
+import 'package:qr_check_in/services/event_service.dart';
 
 class ManageEventController extends GetxController {
   //Host data controllers
   bool autovalidateMode = false;
+  bool modalAutoValidateMode = false;
+  final EventService _eventService = EventService();
   final firstNameCtrl = TextEditingController();
   final lastNameCtrl = TextEditingController();
   final roleCtrl = TextEditingController(text: 'host');
   final dpiCtrl = TextEditingController();
   final nitCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
+
+  //event data controllers
+  final nameCtrl = TextEditingController();
+  final descriptionCtrl = TextEditingController();
+  final totalSpacesCtrl = TextEditingController();
+  final eventDateCtrl = TextEditingController();
+
+  RxList<EventTable> eventTables = <EventTable>[].obs;
+
+  EventModel? selectedData;
+
+  void setEditMode(dynamic args) {
+    if (args['data'] != null && args['data'] is EventModel) {
+      selectedData = args['data'];
+      //Host data
+      firstNameCtrl.text = selectedData!.host.firstName;
+      lastNameCtrl.text = selectedData!.host.lastName;
+      roleCtrl.text = selectedData!.host.role;
+      dpiCtrl.text = selectedData!.host.dpi;
+      nitCtrl.text = selectedData!.host.nit;
+      phoneCtrl.text = selectedData!.host.phone;
+
+      //Event data
+      nameCtrl.text = selectedData!.name;
+      descriptionCtrl.text = selectedData!.description;
+      totalSpacesCtrl.text = selectedData!.totalSpaces.toString();
+      eventDateCtrl.text = selectedData!.eventDate.toLocal().toString();
+      eventTables.assignAll(selectedData?.eventTables ?? []);
+    } else {
+      selectedData = null;
+    }
+  }
+
+  void appendEventTable({
+    required String name,
+    String? description,
+    required int tableNumber,
+    required int capacity,
+  }) {
+    final newTable = EventTable(
+      id: 0,
+      eventId: selectedData?.id ?? 0,
+      name: name,
+      description: description ?? '',
+      tableNumber: tableNumber,
+      capacity: capacity,
+      createdAt: DateTime.now(),
+      updatedAt: null,
+      status: 1,
+    );
+    eventTables.add(newTable);
+    update();
+  }
+
+  Future<void> removeEventTable(EventTable table) async {
+    if (table.id != 0) {
+      // Aquí iría la lógica para eliminar la mesa del backend si es necesario
+    }
+    eventTables.remove(table);
+    update();
+  }
+
+  bool _hasFormChanges() {
+    if (selectedData == null) return false;
+
+    return firstNameCtrl.text != selectedData!.host.firstName ||
+        lastNameCtrl.text != selectedData!.host.lastName ||
+        roleCtrl.text != selectedData!.host.role ||
+        dpiCtrl.text != selectedData!.host.dpi ||
+        nitCtrl.text != selectedData!.host.nit ||
+        phoneCtrl.text != selectedData!.host.phone ||
+        nameCtrl.text != selectedData!.name ||
+        descriptionCtrl.text != selectedData!.description ||
+        totalSpacesCtrl.text != selectedData!.totalSpaces.toString() ||
+        eventDateCtrl.text != selectedData!.eventDate.toString();
+  }
+
+  bool _hasNewTables() {
+    return eventTables.any((table) => table.id == 0);
+  }
+
+  Future<void> addEventTables() async {
+    if (!_hasNewTables()) return;
+
+    final newTables = eventTables.where((table) => table.id == 0).toList();
+    final result = await _eventService.addEventTables(
+      eventId: selectedData!.id,
+      data: newTables,
+    );
+
+    if (result.success) {
+      Get.snackbar('Success', 'Mesas agregadas correctamente');
+      Get.back();
+    } else {
+      Get.snackbar('Error', result.message ?? 'Error al agregar mesas');
+    }
+  }
+
+  Future<void> updateData() async {
+    final bool hasFormChanges = _hasFormChanges();
+    final bool hasNewTables = _hasNewTables();
+
+    if (!hasFormChanges && !hasNewTables) {
+      Get.snackbar('Info', 'No hay cambios para guardar');
+      return;
+    }
+
+    if (hasFormChanges) {
+      // Actualizar datos del evento, anfitrión y/o mesas nuevas
+      final updatedEvent = EventModel(
+        id: selectedData!.id,
+        hostId: selectedData!.host.id,
+        name: nameCtrl.text,
+        description: descriptionCtrl.text,
+        totalSpaces: int.parse(totalSpacesCtrl.text),
+        eventDate: DateTime.parse(eventDateCtrl.text),
+        status: selectedData!.status,
+        createdAt: selectedData!.createdAt,
+        updatedAt: DateTime.now(),
+        host: Host(
+          id: selectedData!.host.id,
+          firstName: firstNameCtrl.text,
+          lastName: lastNameCtrl.text,
+          role: roleCtrl.text,
+          dpi: dpiCtrl.text,
+          nit: nitCtrl.text,
+          phone: phoneCtrl.text,
+          createdAt: selectedData!.host.createdAt,
+          updatedAt: DateTime.now(),
+        ),
+        eventTables: eventTables,
+        reservations: selectedData!.reservations,
+      );
+
+      final result = await _eventService.updateEvent(data: updatedEvent);
+      if (result.success) {
+        Get.snackbar('Success', 'Evento actualizado correctamente');
+        Get.back();
+      } else {
+        Get.snackbar('Error', result.message ?? 'Error al actualizar evento');
+      }
+    } else {
+      addEventTables();
+    }
+  }
+
+  Future<void> saveData() async {
+    if (selectedData != null) {
+      updateData();
+    } else {
+      // Create new event
+      final newEvent = EventModel(
+        id: 0,
+        hostId: 0,
+        status: 1,
+        createdAt: DateTime.now(),
+        host: Host(
+          id: 0,
+          firstName: firstNameCtrl.text,
+          lastName: lastNameCtrl.text,
+          role: roleCtrl.text,
+          dpi: dpiCtrl.text,
+          nit: nitCtrl.text,
+          phone: phoneCtrl.text,
+          createdAt: DateTime.now(),
+        ),
+        name: nameCtrl.text,
+        description: descriptionCtrl.text,
+        totalSpaces: int.parse(totalSpacesCtrl.text),
+        eventDate: DateTime.parse(eventDateCtrl.text),
+        eventTables: eventTables.toList(),
+        reservations: [],
+      );
+
+      final result = await _eventService.createEvent(data: newEvent);
+      if (result.success) {
+        Get.snackbar('Success', 'Event created successfully');
+        Get.back();
+      } else {
+        Get.snackbar('Error', result.message ?? 'Unknown error');
+      }
+    }
+  }
 
   // Validator functions
   String? validateRequiredField(String? value) {
@@ -45,7 +231,9 @@ class ManageEventController extends GetxController {
     }
 
     // Validar formato: puede tener hasta dos guiones
-    final validFormat = RegExp(r'^\d{1,13}$|^\d{1,6}-\d{1,6}$|^\d{1,4}-\d{1,4}-\d{1,4}$');
+    final validFormat = RegExp(
+      r'^\d{1,13}$|^\d{1,6}-\d{1,6}$|^\d{1,4}-\d{1,4}-\d{1,4}$',
+    );
     if (!validFormat.hasMatch(value)) {
       return 'Formato de DPI inválido';
     }
@@ -58,8 +246,9 @@ class ManageEventController extends GetxController {
       return 'El teléfono es requerido';
     }
 
-
-    final validFormat = RegExp(r'^\+?[1-9]\d{0,3}[ -]?\d{4}[ -]?\d{4}$|^\d{4}-?\d{4}$');
+    final validFormat = RegExp(
+      r'^\+?[1-9]\d{0,3}[ -]?\d{4}[ -]?\d{4}$|^\d{4}-?\d{4}$',
+    );
     if (!validFormat.hasMatch(value)) {
       return 'Formato de teléfono inválido';
     }
@@ -100,35 +289,23 @@ class ManageEventController extends GetxController {
     return null;
   }
 
-  //event data controllers
-  final nameCtrl = TextEditingController();
-  final descriptionCtrl = TextEditingController();
-  final totalSpacesCtrl = TextEditingController();
-  final eventDateCtrl = TextEditingController();
-
-  RxList<EventTable> eventTables = <EventTable>[].obs;
-
-  EventModel? selectedData;
-
-  void setEditMode(dynamic args) {
-    if (args['data'] != null && args['data'] is EventModel) {
-      selectedData = args['data'];
-      //Host data
-      firstNameCtrl.text = selectedData!.host.firstName;
-      lastNameCtrl.text = selectedData!.host.lastName;
-      roleCtrl.text = selectedData!.host.role;
-      dpiCtrl.text = selectedData!.host.dpi;
-      nitCtrl.text = selectedData!.host.nit;
-      phoneCtrl.text = selectedData!.host.phone;
-
-      //Event data
-      nameCtrl.text = selectedData!.name;
-      descriptionCtrl.text = selectedData!.description;
-      totalSpacesCtrl.text = selectedData!.totalSpaces.toString();
-      eventDateCtrl.text = selectedData!.eventDate.toLocal().toString();
-      eventTables.assignAll(selectedData?.eventTables ?? []);
-    } else {
-      selectedData = null;
+  String? validateTableSpaces(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Este campo es requerido';
     }
+    int? spaces = int.tryParse(value);
+    if (spaces == null || spaces <= 0) {
+      return 'Ingresa un número válido';
+    }
+    int maxSpaces = int.parse(totalSpacesCtrl.text);
+    int usedSpaces = eventTables.fold<int>(
+      0,
+      (sum, table) => sum + table.capacity,
+    );
+    if (usedSpaces + spaces > maxSpaces) {
+      return 'No puede exceder la capacidad total';
+    }
+
+    return null;
   }
 }

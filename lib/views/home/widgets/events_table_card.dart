@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
 import 'package:qr_check_in/widgets/datatable/common_data_table.dart';
 import 'package:qr_check_in/views/home/controllers/home_controller.dart';
 import 'package:qr_check_in/widgets/datatable/custom_data_table_widget_v2.dart';
@@ -64,7 +65,10 @@ class EventsTableCard extends StatelessWidget {
                               child: Icon(Icons.edit),
                             ),
                             onPressed: () {
-                              // Edit action
+                              Get.toNamed(
+                                RouteConstants.manageEvent,
+                                arguments: {'isEdit': true, 'data': value},
+                              );
                             },
                           ),
                           IconButton(
