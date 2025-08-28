@@ -18,7 +18,6 @@ class NavigationSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MenuSidebarController menuController = Get.find();
-    final userInfo = Get.put<SessionController>(SessionController());
     final SidebarController sidebarController = Get.find();
     final colorScheme = Theme.of(context).colorScheme;
 

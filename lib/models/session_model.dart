@@ -106,7 +106,7 @@ class PersonModel {
     return PersonModel(
       id: json['id'],
       firstName: json['firstName'],
-      lastName: json?['lastName'] ?? "",
+      lastName: json['lastName'] ?? "",
       employeeId: json['employeeId'] != null
           ? json['employeeId'].toString()
           : null, // Optional field

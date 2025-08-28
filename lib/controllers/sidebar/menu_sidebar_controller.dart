@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 import 'package:qr_check_in/controllers/loader_controller.dart';
 import 'package:qr_check_in/models/menu_model.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
