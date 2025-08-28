@@ -10,6 +10,7 @@ import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
 import 'package:qr_check_in/shared/resources/get_routes/get_routes.dart';
 import 'package:qr_check_in/controllers/sidebar/sidebar_controller.dart';
 import 'package:qr_check_in/controllers/sidebar/menu_sidebar_controller.dart';
+
 void main() {
   Get.put(MenuSidebarController());
   Get.put(SidebarController());
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: GetMaterialApp(
-        initialRoute: RouteConstants.checkIn,
+        initialRoute: RouteConstants.dashboard,
         navigatorObservers: [routeObserver],
         title: 'Qr Check In',
         debugShowCheckedModeBanner: false,

@@ -229,7 +229,11 @@ class ResponsiveSimpleLayout extends StatelessWidget {
               ? IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    if (!Navigator.of(context).canPop() || ModalRoute.of(context)?.isFirst == true) {
+                      Get.offAllNamed(RouteConstants.dashboard);
+                    } else {
+                      Navigator.of(context).pop();
+                    }
                   },
                 )
               : null,

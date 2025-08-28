@@ -32,6 +32,7 @@ class _CheckInPageState extends State<CheckInPage>
     return ResponsiveSimpleLayout(
       title: 'Check In',
       description: 'Gestionar entradas',
+      showBackButton: true,
       content: LayoutBuilder(
         builder: (context, constraints) {
           final bool isMaximized = constraints.maxWidth > 600;
