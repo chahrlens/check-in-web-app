@@ -5,6 +5,7 @@ import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
 import 'package:qr_check_in/widgets/datatable/common_data_table.dart';
 import 'package:qr_check_in/views/home/controllers/home_controller.dart';
 import 'package:qr_check_in/widgets/datatable/custom_data_table_widget_v2.dart';
+import 'package:qr_check_in/services/qr_print_service.dart';
 
 class EventsTableCard extends StatelessWidget {
   const EventsTableCard({super.key});
@@ -77,8 +78,8 @@ class EventsTableCard extends StatelessWidget {
                                 Colors.blue,
                               ),
                             ),
-                            onPressed: () {},
-                            icon: Tooltip(
+                            onPressed: () => QRPrintService.openPrintWindow(item),
+                            icon: const Tooltip(
                               message: 'Imprimir pase a invitados',
                               child: Icon(Icons.print),
                             ),
