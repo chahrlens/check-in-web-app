@@ -1,3 +1,5 @@
+import 'package:qr_check_in/models/has_id_label.dart';
+
 import 'guest_model.dart';
 
 class EventModel {
@@ -126,13 +128,13 @@ class Host {
 
   factory Host.fromJson(Map<String, dynamic> json) {
     return Host(
-      id: json['id'],
-      firstName: json['first_name'],
-      lastName: json['last_name'],
-      role: json['role'],
-      dpi: json['dpi'],
-      nit: json['nit'],
-      phone: json['phone'],
+      id: json['id']?? 0,
+      firstName: json['first_name'] ?? '',
+      lastName: json['last_name'] ?? '',
+      role: json['role'] ?? '',
+      dpi: json['dpi'] ?? '',
+      nit: json['nit'] ?? '',
+      phone: json['phone'] ?? '',
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])
@@ -154,7 +156,7 @@ class Host {
   String get fullName => '$firstName $lastName';
 }
 
-class EventTable {
+class EventTable implements HasIdLabel {
   final int id;
   final int eventId;
   final String name;
@@ -212,6 +214,12 @@ class EventTable {
       "capacity": capacity,
     };
   }
+
+  @override
+  String get identifier => id.toString();
+
+  @override
+  String get identifierLabel => "$name '$description'";
 }
 
 class Reservation {
@@ -258,4 +266,75 @@ class Reservation {
       table: EventTable.fromJson(json['table']),
     );
   }
+}
+
+class EventReservation {
+  final int eventId;
+  final List<ReservationDetails> details;
+
+  EventReservation({required this.eventId, required this.details});
+
+  Map<String, dynamic> toJson() {
+    return {
+      "eventId": eventId,
+      "reservations": details.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class ReservationDetails {
+  final String guestName;
+  final String guestLastName;
+  final String phone;
+  final String dpi;
+  final String nit;
+  final int tableId;
+  final String table;
+  final int totalOccupants;
+
+  ReservationDetails({
+    required this.guestName,
+    required this.guestLastName,
+    required this.phone,
+    required this.dpi,
+    required this.nit,
+    required this.tableId,
+    required this.table,
+    required this.totalOccupants,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "guestName": guestName,
+      "guestLastName": guestLastName,
+      "phone": phone,
+      "dpi": dpi,
+      "nit": nit,
+      "tableId": tableId,
+      "totalOccupants": totalOccupants,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReservationDetails &&
+          runtimeType == other.runtimeType &&
+          guestName == other.guestName &&
+          guestLastName == other.guestLastName &&
+          phone == other.phone &&
+          dpi == other.dpi &&
+          nit == other.nit &&
+          tableId == other.tableId &&
+          totalOccupants == other.totalOccupants;
+
+  @override
+  int get hashCode =>
+      guestName.hashCode ^
+      guestLastName.hashCode ^
+      phone.hashCode ^
+      dpi.hashCode ^
+      nit.hashCode ^
+      tableId.hashCode ^
+      totalOccupants.hashCode;
 }

@@ -81,12 +81,30 @@ class EventService extends BaseService {
         "tablesData": data.map((e) => e.toJson()).toList(),
       };
       final response = await httpClient.post(
-        buildUri('/event/v1/events/$eventId/tables'),
+        buildUri('/event/v1/events/tables'),
         body: json.encode(jsonData),
         headers: {'Content-Type': 'application/json'},
       );
       final apiResponse = ApiResponse.fromResponse(response);
       return apiResponse;
+    } catch (e) {
+      debugLog(e.toString());
+      return ApiResponse(
+        statusCode: 500,
+        success: false,
+        message: 'An error occurred',
+      );
+    }
+  }
+
+  Future<ApiResponse> addReservations(EventReservation reservations) async {
+    try {
+      final response = await httpClient.post(
+        buildUri('/event/v1/events/reservations'),
+        body: json.encode(reservations.toJson()),
+        headers: {'Content-Type': 'application/json'},
+      );
+      return ApiResponse.fromResponse(response);
     } catch (e) {
       debugLog(e.toString());
       return ApiResponse(

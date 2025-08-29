@@ -6,7 +6,6 @@ import 'package:qr_check_in/models/has_id_label.dart';
 import 'package:qr_check_in/models/dropdown_option_model.dart';
 import 'package:qr_check_in/shared/resources/custom_style.dart';
 
-
 class GenericLoadingAutocompleteDropdown<T extends HasIdLabel>
     extends StatefulWidget {
   final RxBool isLoading;
@@ -22,6 +21,7 @@ class GenericLoadingAutocompleteDropdown<T extends HasIdLabel>
   final String loadingText;
   final T? initialValue;
   final String? Function(T?)? validator;
+  final TextEditingController? controller;
 
   const GenericLoadingAutocompleteDropdown({
     super.key,
@@ -38,6 +38,7 @@ class GenericLoadingAutocompleteDropdown<T extends HasIdLabel>
     this.loadingText = '',
     this.initialValue,
     this.validator,
+    this.controller,
   });
 
   @override
@@ -50,11 +51,13 @@ class _GenericLoadingAutocompleteDropdownState<T extends HasIdLabel>
   DropDownOption<dynamic>? _initialValue;
   List<DropDownOption<T>> _convertToDropDownOptions(List<T> items) {
     return items
-        .map((item) => DropDownOption<T>(
-              id: item.identifier,
-              label: item.identifierLabel,
-              value: item,
-            ))
+        .map(
+          (item) => DropDownOption<T>(
+            id: item.identifier,
+            label: item.identifierLabel,
+            value: item,
+          ),
+        )
         .toList();
   }
 
@@ -62,10 +65,12 @@ class _GenericLoadingAutocompleteDropdownState<T extends HasIdLabel>
     if (query.isEmpty) return widget.items;
 
     return widget.items.where((item) {
-      final idMatches =
-          item.identifier.toLowerCase().contains(query.toLowerCase());
-      final labelMatches =
-          item.identifierLabel.toLowerCase().contains(query.toLowerCase());
+      final idMatches = item.identifier.toLowerCase().contains(
+        query.toLowerCase(),
+      );
+      final labelMatches = item.identifierLabel.toLowerCase().contains(
+        query.toLowerCase(),
+      );
       return idMatches || labelMatches;
     }).toList();
   }
@@ -120,6 +125,7 @@ class _GenericLoadingAutocompleteDropdownState<T extends HasIdLabel>
           prefixIcon: widget.prefixIcon,
           enabled: widget.enabled,
           listItems: _convertToDropDownOptions(widget.items),
+          textController: widget.controller,
           onSelected: (option) {
             final opt = option as DropDownOption<T>;
             return widget.onSelected(opt.value as T);

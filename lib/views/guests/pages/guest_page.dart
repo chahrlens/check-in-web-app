@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_check_in/models/event_model.dart';
-import 'package:qr_check_in/views/guests/controllers/guest_controller.dart';
-import 'package:qr_check_in/widgets/inputs/custom_input_widget.dart';
 import 'package:qr_check_in/widgets/layout/content_card.dart';
 import 'package:qr_check_in/widgets/layout/responsive_layout.dart';
+import 'package:qr_check_in/views/guests/widgets/host_widget_form.dart';
+import 'package:qr_check_in/views/guests/widgets/guest_entity_form.dart';
+import 'package:qr_check_in/views/guests/controllers/guest_controller.dart';
 
 class ManageGuestsPage extends StatefulWidget {
   const ManageGuestsPage({super.key});
@@ -41,144 +41,111 @@ class _ManageGuestsPageState extends State<ManageGuestsPage> {
               children: [
                 ContentCard(
                   title: 'Anfitrión',
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      runSpacing: 12,
-                      children: [
-                        CustomInputWidget(
-                          width: width,
-                          readOnly: true,
-                          controller: _controller.hostName,
-                          label: 'Nombre del Anfitrión',
-                          hintText: 'Ingresa el nombre del anfitrión',
-                          prefixIcon: Icons.person,
-                        ),
-
-                        CustomInputWidget(
-                          width: width,
-                          readOnly: true,
-                          controller: _controller.eventName,
-                          label: 'Nombre del Evento',
-                          hintText: 'Ingresa el nombre del evento',
-                          prefixIcon: Icons.event,
-                        ),
-                        CustomInputWidget(
-                          width: width,
-                          readOnly: true,
-                          controller: _controller.totalSpaces,
-                          label: 'Total de Espacios',
-                          hintText: 'Ingresa el total de espacios',
-                          prefixIcon: Icons.event_seat,
-                        ),
-                        CustomInputWidget(
-                          width: width,
-                          readOnly: true,
-                          controller: _controller.totalTables,
-                          label: 'Total de Mesas',
-                          hintText: 'Ingresa el total de mesas',
-                          prefixIcon: Icons.table_chart,
-                        ),
-                        CustomInputWidget(
-                          width: width,
-                          readOnly: true,
-                          controller: _controller.reservedSpaces,
-                          label: 'Espacios Reservados',
-                          hintText: 'Ingresa los espacios reservados',
-                          prefixIcon: Icons.event_busy,
-                        ),
-                        CustomInputWidget(
-                          width: width,
-                          readOnly: true,
-                          controller: _controller.availableSpaces,
-                          label: 'Espacios Disponibles',
-                          hintText: 'Ingresa los espacios disponibles',
-                          prefixIcon: Icons.event_available,
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: HostEntityForm(width: width),
                 ),
                 const SizedBox(height: 12),
                 ContentCard(
-                  child: Wrap(
-                    children: [
-                      //dropdown here
-                      Obx(() {
-                        return DropdownButton<EventTable>(
-                          value: _controller.selectedTable.value,
-                          hint: Text('Seleccionar Mesa'),
-                          items: _controller.eventTables.map((table) {
-                            return DropdownMenuItem<EventTable>(
-                              value: table,
-                              child: Text('Mesa ${table.id}'),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            _controller.selectedTable.value = value;
-                          },
+                  title: 'Invitado',
+                  child: GuestEntityForm(width: width),
+                ),
+                const SizedBox(height: 12),
+                ContentCard(
+                  child: Obx(
+                    () => Wrap(
+                      children: List.generate(_controller.reservations.length, (
+                        index,
+                      ) {
+                        final reservation = _controller.reservations[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.blueAccent,
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${reservation.guestName} ${reservation.guestLastName}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text('Mesa: ${reservation.table}'),
+                                    Text(
+                                      'Espacios: ${reservation.totalOccupants}',
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.redAccent,
+                                  ),
+                                  onPressed: () {
+                                    _controller.reservations.removeAt(index);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       }),
-                      CustomInputWidget(
-                        width: width,
-                        controller: _controller.guestName,
-                        label: 'Nombre del Invitado',
-                        hintText: 'Ingresa el nombre del invitado',
-                        prefixIcon: Icons.person,
-                      ),
-                      CustomInputWidget(
-                        width: width,
-                        controller: _controller.guestLastName,
-                        label: 'Apellido del Invitado',
-                        hintText: 'Ingresa el apellido del invitado',
-                        prefixIcon: Icons.person,
-                      ),
-                      CustomInputWidget(
-                        width: width,
-                        controller: _controller.phone,
-                        label: 'Teléfono',
-                        hintText: 'Ingresa el teléfono',
-                        prefixIcon: Icons.phone,
-                      ),
-                      CustomInputWidget(
-                        width: width,
-                        controller: _controller.dpi,
-                        label: 'DPI',
-                        hintText: 'Ingresa el DPI',
-                        prefixIcon: Icons.credit_card,
-                      ),
-                      CustomInputWidget(
-                        width: width,
-                        controller: _controller.nit,
-                        label: 'NIT',
-                        hintText: 'Ingresa el NIT',
-                        prefixIcon: Icons.business,
-                      ),
-                      CustomInputWidget(
-                        width: width,
-                        controller: _controller.tableId,
-                        label: 'ID de Mesa',
-                        hintText: 'Ingresa el ID de la mesa',
-                        prefixIcon: Icons.table_chart,
-                      ),
-                      CustomInputWidget(
-                        width: width,
-                        controller: _controller.numCompanions,
-                        label: 'Número de Acompañantes',
-                        hintText: 'Ingresa el número de acompañantes',
-                        prefixIcon: Icons.group,
-                      ),
-                      //button here
-                      ElevatedButton(
-                        onPressed: () {
-                          // Handle button press
-                        },
-                        child: Text('Reservar'),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                      ),
+                      onPressed: () {
+                        _controller.cleanGuest();
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(Icons.cancel),
+                      label: Text('Cancelar'),
+                    ),
+
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                      onPressed: () async {
+                        await _controller.handleSave();
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      icon: Icon(Icons.save),
+                      label: Text('Guardar'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           );
