@@ -60,7 +60,10 @@ class EventsTableCard extends StatelessWidget {
                     cell(item.availableUnAssigned.toString(), context),
                     cell(item.guestEntered.toString(), context),
                     cell(item.availableCount.toString(), context),
-                    cell(item.eventDate.toLocal().toString().split(' ')[0], context),
+                    cell(
+                      item.eventDate.toLocal().toString().split(' ')[0],
+                      context,
+                    ),
                     DataCell(
                       Row(
                         children: [
@@ -105,7 +108,46 @@ class EventsTableCard extends StatelessWidget {
                               child: Icon(Icons.check_circle),
                             ),
                             onPressed: () {
-                              // Delete action
+                              // controller.deleteEvent(item.id);
+                              //Modal confirmation
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Confirmar eliminación'),
+                                    content: Text(
+                                      '¿Estás seguro de que deseas eliminar este evento?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        style: ButtonStyle(
+                                          foregroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                Colors.blueAccent,
+                                              ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Cancelar'),
+                                      ),
+                                      TextButton(
+                                        style: ButtonStyle(
+                                          foregroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                            Colors.red,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          controller.deleteEvent(item.id);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Eliminar'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                           ),
                           PopupMenuButton<int>(

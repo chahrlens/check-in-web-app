@@ -28,6 +28,16 @@ class HomeController extends GetxController {
     }
   }
 
+  void deleteEvent(int eventId) async {
+    final result = await _eventService.deleteEvent(eventId);
+    if (result.success) {
+      events.removeWhere((event) => event.id == eventId);
+      Get.snackbar('Success', 'Event deleted successfully');
+    } else {
+      Get.snackbar('Error', result.message ?? 'Failed to delete event');
+    }
+  }
+
   void cleanData() {
     searchCtrl.clear();
   }

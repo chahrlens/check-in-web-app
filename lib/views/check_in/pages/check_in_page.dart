@@ -94,41 +94,36 @@ class _CheckInPageState extends State<CheckInPage>
                               prefixIcon: Icons.phone,
                               readOnly: true,
                             ),
+                            CustomInputWidget(
+                              width: firstInputsWidth,
+                              controller: _controller.tableNumber,
+                              label: 'Mesa',
+                              hintText: 'Número de mesa',
+                              prefixIcon: Icons.table_restaurant,
+                              readOnly: true,
+                            ),
+                            CustomInputWidget(
+                              width: firstInputsWidth,
+                              controller: _controller.reservedSpaces,
+                              label: 'Espacios reservados',
+                              hintText: 'Número de espacios reservados',
+                              prefixIcon: Icons.confirmation_number,
+                              readOnly: true,
+                            ),
+                            CustomInputWidget(
+                              width: firstInputsWidth,
+                              controller: _controller.quantityAvailable,
+                              label: 'Espacios Disponibles',
+                              hintText: 'Entradas disponibles',
+                              prefixIcon: Icons.confirmation_number,
+                              readOnly: true,
+                            ),
                           ],
-                        ),
-                        const SizedBox(height: 10),
-                        Form(
-                          key: _formKey,
-                          child: Wrap(
-                            spacing: 20,
-                            runSpacing: 10,
-                            alignment: WrapAlignment.spaceBetween,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              CustomInputWidget(
-                                width: firstInputsWidth,
-                                controller: _controller.tableNumber,
-                                label: 'Mesa',
-                                hintText: 'Número de mesa',
-                                prefixIcon: Icons.table_restaurant,
-                                readOnly: true,
-                              ),
-                              CustomInputWidget(
-                                width: firstInputsWidth,
-                                controller: _controller.quantityAvailable,
-                                label: 'Espacios Disponibles',
-                                hintText: 'Entradas disponibles',
-                                prefixIcon: Icons.confirmation_number,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // if (_controller.checkInData != null)
                   FixedContainer(
                     maxWidth: double.infinity,
                     minWidth: 0.0,
@@ -169,6 +164,23 @@ class _CheckInPageState extends State<CheckInPage>
                                       return null;
                                     },
                                   ),
+                                  SizedBox(
+                                    width: firstInputsWidth * 1 / 2,
+                                    child: Obx(() {
+                                      return CheckboxListTile(
+                                        title: const Text(
+                                          'Ingresa invitado principal',
+                                        ),
+                                        enabled:
+                                            !_controller.guestIsArrived.value,
+                                        value: _controller.guestEntered.value,
+                                        onChanged: (value) {
+                                          _controller.guestEntered.value =
+                                              value ?? false;
+                                        },
+                                      );
+                                    }),
+                                  ),
                                   const SizedBox(width: 10, height: 10),
                                   ElevatedButton.icon(
                                     onPressed: _controller.isLoading.value
@@ -178,7 +190,9 @@ class _CheckInPageState extends State<CheckInPage>
                                                 .validate()) {
                                               final success = await _controller
                                                   .performCheckIn(context);
-                                              if (success) setState(() {});
+                                              if (success && context.mounted) {
+                                                Navigator.of(context).pop();
+                                              }
                                             }
                                           },
                                     icon: const Icon(Icons.check),

@@ -29,11 +29,8 @@ abstract class BaseService {
   }
 
   Uri buildUri(String path, {Map<String, dynamic>? queryParameters}) {
-    final uri = Uri.parse('$baseUrl$path');
-    if (queryParameters != null) {
-      final queryString = buildQueryParameters(queryParameters);
-      return uri.replace(query: queryString);
-    }
+    final params = buildQueryParameters(queryParameters ?? {});
+    final uri = Uri.parse('$baseUrl$path$params');
     return uri;
   }
 }

@@ -1,16 +1,20 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
 import 'package:qr_check_in/models/check_in_model.dart';
 import 'package:qr_check_in/services/check_in_service.dart';
 
 class CheckInController extends GetxController {
   final userName = TextEditingController();
   final tableNumber = TextEditingController();
+  final reservedSpaces = TextEditingController();
   final quantityAvailable = TextEditingController();
   final quantity = TextEditingController();
   final guestPhone = TextEditingController();
   final guestDpi = TextEditingController();
   final CheckInService _checkInService = CheckInService();
+
+  RxBool guestIsArrived = false.obs;
+  RxBool guestEntered = false.obs;
 
   final isLoading = false.obs;
   final hasError = false.obs;
@@ -69,10 +73,12 @@ class CheckInController extends GetxController {
       userName.text = checkInData!.guest.name;
       guestPhone.text = checkInData!.guest.phone;
       guestDpi.text = checkInData!.guest.dpi;
+      guestIsArrived.value = checkInData!.guest.hasEntered;
 
       // Datos de la mesa
       tableNumber.text =
           'Mesa ${checkInData!.table.tableNumber} - ${checkInData!.table.name}';
+      reservedSpaces.text = checkInData?.companions.total.toString() ?? '0';
 
       // Mostrar espacios totales disponibles (no solo acompañantes)
       quantityAvailable.text = checkInData!.totalSpacesRemaining.toString();
@@ -112,9 +118,7 @@ class CheckInController extends GetxController {
       final response = await _checkInService.performCheckIn(
         numCompanionsEntered: qty,
         uuidCode: currentQrUuid!,
-        guestEntered: !checkInData!
-            .guest
-            .hasEntered, // Si no ha entrado, marcamos como entrada
+        guestEntered: guestEntered.value,
       );
 
       if (response.success) {
@@ -145,9 +149,10 @@ class CheckInController extends GetxController {
     }
   }
 
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+  void _showMessage(BuildContext context, String message, [bool success = true]) {
+    Get.snackbar('Información', message,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: success ? Colors.green[600] : Colors.red[600],
+        colorText: success ? Colors.black : Colors.white);
   }
 }

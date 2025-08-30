@@ -114,4 +114,20 @@ class EventService extends BaseService {
       );
     }
   }
+
+  Future<ApiResponse> deleteEvent(int eventId) async {
+    try {
+      final response = await httpClient.delete(
+        buildUri('/event/v1/events/', queryParameters: {"eventId": eventId}),
+      );
+      return ApiResponse.fromResponse(response);
+    } catch (e) {
+      debugLog(e.toString());
+      return ApiResponse(
+        statusCode: 500,
+        success: false,
+        message: 'An error occurred',
+      );
+    }
+  }
 }
