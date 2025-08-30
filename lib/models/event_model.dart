@@ -7,6 +7,7 @@ class EventModel {
   final String name;
   final String description;
   final int totalSpaces;
+  final int guestEntered;
   final DateTime eventDate;
   final int status;
   final DateTime createdAt;
@@ -21,6 +22,7 @@ class EventModel {
     required this.name,
     required this.description,
     required this.totalSpaces,
+    required this.guestEntered,
     required this.eventDate,
     required this.status,
     required this.createdAt,
@@ -47,6 +49,7 @@ class EventModel {
       name: json['name'],
       description: json['description'] ?? '',
       totalSpaces: json['total_spaces'] ?? 0,
+      guestEntered: json['companionsEntered'] ?? 0,
       eventDate: DateTime.parse(json['event_date']),
       status: json['status'],
       createdAt: DateTime.parse(json['created_at']),
@@ -100,6 +103,8 @@ class EventModel {
   int get tableCount => eventTables.length;
   int get reservationCount =>
       reservations.fold(0, (sum, r) => sum + r.numCompanions);
+  int get availableUnAssigned => totalSpaces - reservationCount;
+  int get availableCount => reservationCount - guestEntered;
 }
 
 class Host {
@@ -127,7 +132,7 @@ class Host {
 
   factory Host.fromJson(Map<String, dynamic> json) {
     return Host(
-      id: json['id']?? 0,
+      id: json['id'] ?? 0,
       firstName: json['first_name'] ?? '',
       lastName: json['last_name'] ?? '',
       role: json['role'] ?? '',

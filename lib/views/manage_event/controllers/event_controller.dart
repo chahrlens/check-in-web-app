@@ -127,6 +127,7 @@ class ManageEventController extends GetxController {
         id: selectedData!.id,
         hostId: selectedData!.host.id,
         name: nameCtrl.text,
+        guestEntered: 0,
         description: descriptionCtrl.text,
         totalSpaces: int.parse(totalSpacesCtrl.text),
         eventDate: DateTime.parse(eventDateCtrl.text),
@@ -169,6 +170,7 @@ class ManageEventController extends GetxController {
         id: 0,
         hostId: 0,
         status: 1,
+        guestEntered: 0,
         createdAt: DateTime.now(),
         host: Host(
           id: 0,

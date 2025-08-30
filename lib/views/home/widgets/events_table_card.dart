@@ -21,11 +21,14 @@ class EventsTableCard extends StatelessWidget {
         columnSizes: <ColumnSize>[
           ColumnSize.S,
           ColumnSize.L,
-          ColumnSize.L,
-          ColumnSize.S,
-          ColumnSize.S,
-          ColumnSize.S,
           ColumnSize.M,
+          ColumnSize.S,
+          ColumnSize.S,
+          ColumnSize.S,
+          ColumnSize.S,
+          ColumnSize.S,
+          ColumnSize.S,
+          ColumnSize.S,
           ColumnSize.M,
         ],
         tableHeaders: <String>[
@@ -35,6 +38,9 @@ class EventsTableCard extends StatelessWidget {
           'Total espacios',
           'Total mesas',
           'Total Reservaciones',
+          'Total sin reservar',
+          'Ingresados',
+          'Disponibles',
           'Fecha',
           'Acciones',
         ],
@@ -51,7 +57,10 @@ class EventsTableCard extends StatelessWidget {
                     cell(item.totalSpaces.toString(), context),
                     cell(item.tableCount.toString(), context),
                     cell(item.reservationCount.toString(), context),
-                    cell(item.eventDate.toLocal().toString(), context),
+                    cell(item.availableUnAssigned.toString(), context),
+                    cell(item.guestEntered.toString(), context),
+                    cell(item.availableCount.toString(), context),
+                    cell(item.eventDate.toLocal().toString().split(' ')[0], context),
                     DataCell(
                       Row(
                         children: [
@@ -78,7 +87,8 @@ class EventsTableCard extends StatelessWidget {
                                 Colors.blue,
                               ),
                             ),
-                            onPressed: () => QRPrintService.openPrintWindow(item),
+                            onPressed: () =>
+                                QRPrintService.openPrintWindow(item),
                             icon: const Tooltip(
                               message: 'Imprimir pase a invitados',
                               child: Icon(Icons.print),
