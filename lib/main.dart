@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/theme/color_pallete.dart';
-import 'package:qr_check_in/observers/route_observer.dart';
 import 'package:qr_check_in/controllers/loader_controller.dart';
 import 'package:qr_check_in/shared/resources/local_storaje.dart';
 import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
@@ -28,7 +27,6 @@ class MyApp extends StatelessWidget {
     return ToastificationWrapper(
       child: GetMaterialApp(
         initialRoute: RouteConstants.dashboard,
-        navigatorObservers: [routeObserver],
         title: 'Qr Check In',
         debugShowCheckedModeBanner: false,
         getPages: [

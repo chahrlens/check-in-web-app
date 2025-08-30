@@ -1,5 +1,5 @@
-import 'dart:html' as html;
 import 'dart:convert';
+import 'dart:html' as html;
 import 'package:qr_check_in/models/event_model.dart';
 
 class QRPrintService {
@@ -81,7 +81,7 @@ class QRPrintService {
               <div class="qr-card">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(reservation.uuidCode)}"/>
                 <div class="guest-name">${_escapeHtml(reservation.guest.fullName)}</div>
-                <div class="spaces">Espacios reservados: ${reservation.numCompanions + 1}</div>
+                <div class="spaces">Espacios reservados: ${reservation.numCompanions}</div>
               </div>
             ''').join('')}
           </div>

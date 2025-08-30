@@ -1,111 +1,148 @@
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
-
-class UserCheckIn {
-  int id;
-  String name;
-  String email;
-  UserCheckIn({required this.id, required this.name, required this.email});
-}
+import 'package:qr_check_in/models/check_in_model.dart';
+import 'package:qr_check_in/services/check_in_service.dart';
 
 class CheckInController extends GetxController {
-  final userName = TextEditingController(text: 'Jon Doe');
-  final tableNumber = TextEditingController(text: 'Mesa 1');
-  final quantityAvailable = TextEditingController(text: '10');
-  final quantity = TextEditingController(text: '');
+  final userName = TextEditingController();
+  final tableNumber = TextEditingController();
+  final quantityAvailable = TextEditingController();
+  final quantity = TextEditingController();
+  final guestPhone = TextEditingController();
+  final guestDpi = TextEditingController();
+  final CheckInService _checkInService = CheckInService();
 
-  UserCheckIn? selectedElement;
+  final isLoading = false.obs;
+  final hasError = false.obs;
+  final errorMessage = ''.obs;
 
-  /// Simula escaneo de QR y consulta en base de datos
-  Future<void> scanQrAndFetchData(BuildContext context) async {
-    // Aquí deberías integrar el paquete de escaneo de QR y la consulta real a la base de datos
-    // Simulación de datos obtenidos
-    final qrData = await _scanQr(context);
-    if (qrData == null) return;
-    // Simula consulta a base de datos
-    final user = await _fetchUserByQr(qrData);
-    if (user != null) {
-      userName.text = user.name;
-      quantityAvailable.text = user.entriesAvailable.toString();
-      tableNumber.text = user.tableNumber;
-      selectedElement = UserCheckIn(
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      );
-    } else {
-      userName.clear();
-      quantityAvailable.clear();
-      tableNumber.clear();
-      selectedElement = null;
-      _showMessage(context, 'QR no válido o invitado no encontrado');
+  // Datos del check-in
+  CheckInModel? checkInData;
+  String? currentQrUuid;
+
+  @override
+  void dispose() {
+    userName.dispose();
+    tableNumber.dispose();
+    quantityAvailable.dispose();
+    quantity.dispose();
+    guestPhone.dispose();
+    guestDpi.dispose();
+    super.dispose();
+  }
+
+  /// Procesa el código QR escaneado y consulta los detalles del check-in
+  Future<void> processQrCode(String qrCode, BuildContext context) async {
+    try {
+      isLoading.value = true;
+      currentQrUuid = qrCode;
+      clearFields();
+
+      // Llamar al servicio para verificar el QR
+      final result = await _checkInService.getCheckInDetails(qrCode);
+
+      if (result.left != null) {
+        // La consulta fue exitosa, mostramos los datos
+        checkInData = result.left;
+        _fillCheckInDataFields();
+        hasError.value = false;
+      } else {
+        // Error al obtener los datos
+        checkInData = null;
+        hasError.value = true;
+        errorMessage.value = result.right.message ?? 'Error desconocido';
+        _showMessage(context, result.right.message ?? 'Error desconocido');
+      }
+    } catch (e) {
+      hasError.value = true;
+      errorMessage.value = 'Error al procesar el código QR: $e';
+      _showMessage(context, 'Error al procesar el código QR');
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  /// Simula el proceso de check-in y actualización en base de datos
+  /// Llena los campos con los datos obtenidos del servicio
+  void _fillCheckInDataFields() {
+    if (checkInData != null) {
+      // Datos del invitado principal
+      userName.text = checkInData!.guest.name;
+      guestPhone.text = checkInData!.guest.phone;
+      guestDpi.text = checkInData!.guest.dpi;
+
+      // Datos de la mesa
+      tableNumber.text =
+          'Mesa ${checkInData!.table.tableNumber} - ${checkInData!.table.name}';
+
+      // Mostrar espacios totales disponibles (no solo acompañantes)
+      quantityAvailable.text = checkInData!.totalSpacesRemaining.toString();
+    }
+  }
+
+  /// Limpia los campos del formulario
+  void clearFields() {
+    userName.clear();
+    tableNumber.clear();
+    quantityAvailable.clear();
+    quantity.clear();
+    guestPhone.clear();
+    guestDpi.clear();
+    checkInData = null;
+  }
+
+  /// Realiza el proceso de check-in
   Future<bool> performCheckIn(BuildContext context) async {
-    if (selectedElement == null) {
+    if (checkInData == null || currentQrUuid == null) {
       _showMessage(context, 'Primero escanee un QR válido');
       return false;
     }
+
     final qty = int.tryParse(quantity.text) ?? 0;
-    final available = int.tryParse(quantityAvailable.text) ?? 0;
-    if (qty <= 0 || qty > available) {
+    final available = checkInData!.companions.remaining;
+
+    if (qty < 0 || qty > available) {
       _showMessage(context, 'Cantidad inválida o excede las disponibles');
       return false;
     }
-    // Simula actualización en base de datos
-    final success = await _updateEntries(selectedElement!.id, qty);
-    if (success) {
-      quantityAvailable.text = (available - qty).toString();
-      _showMessage(context, 'Check-In realizado con éxito');
-      return true;
-    } else {
-      _showMessage(context, 'Error al realizar Check-In');
-      return false;
-    }
-  }
 
-  // Métodos simulados para ejemplo
-  Future<String?> _scanQr(BuildContext context) async {
-    // Aquí deberías usar un paquete como qr_code_scanner
-    // Simulación: retorna un string de QR
-    // Puedes mostrar un dialog para simular el escaneo
-    return await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Simular escaneo QR'),
-        content: const Text('Ingresa el código QR:'),
-        actions: [
-          TextField(
-            autofocus: true,
-            onSubmitted: (value) => Navigator.of(ctx).pop(value),
-          ),
-        ],
-      ),
-    );
-  }
+    try {
+      isLoading.value = true;
 
-  Future<_UserData?> _fetchUserByQr(String qr) async {
-    // Simula consulta a base de datos
-    // Reemplaza por tu lógica real
-    if (qr == '12345') {
-      return _UserData(
-        id: 1,
-        name: 'Juan Pérez',
-        email: 'juan@example.com',
-        entriesAvailable: 5,
-        tableNumber: 'Mesa 7',
+      // Llamar al servicio para realizar el check-in
+      final response = await _checkInService.performCheckIn(
+        numCompanionsEntered: qty,
+        uuidCode: currentQrUuid!,
+        guestEntered: !checkInData!
+            .guest
+            .hasEntered, // Si no ha entrado, marcamos como entrada
       );
+
+      if (response.success) {
+        // Actualizar datos locales después del check-in exitoso
+        await _refreshCheckInData();
+        _showMessage(context, 'Check-In realizado con éxito');
+        return true;
+      } else {
+        _showMessage(context, response.message ?? 'Error desconocido');
+        return false;
+      }
+    } catch (e) {
+      _showMessage(context, 'Error al realizar Check-In: $e');
+      return false;
+    } finally {
+      isLoading.value = false;
     }
-    return null;
   }
 
-  Future<bool> _updateEntries(int userId, int qty) async {
-    // Simula actualización en base de datos
-    // Reemplaza por tu lógica real
-    await Future.delayed(const Duration(milliseconds: 500));
-    return true;
+  /// Actualiza los datos después de un check-in exitoso
+  Future<void> _refreshCheckInData() async {
+    if (currentQrUuid != null) {
+      final result = await _checkInService.getCheckInDetails(currentQrUuid!);
+      if (result.left != null) {
+        checkInData = result.left;
+        _fillCheckInDataFields();
+      }
+    }
   }
 
   void _showMessage(BuildContext context, String message) {
@@ -113,20 +150,4 @@ class CheckInController extends GetxController {
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
   }
-
-}
-
-class _UserData {
-  final int id;
-  final String name;
-  final String email;
-  final int entriesAvailable;
-  final String tableNumber;
-  _UserData({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.entriesAvailable,
-    required this.tableNumber,
-  });
 }

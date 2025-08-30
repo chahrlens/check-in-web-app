@@ -1,5 +1,4 @@
 import 'package:qr_check_in/models/has_id_label.dart';
-
 import 'guest_model.dart';
 
 class EventModel {
