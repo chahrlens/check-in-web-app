@@ -95,8 +95,8 @@ class ManageEventController extends GetxController {
     return eventTables.any((table) => table.id == 0);
   }
 
-  Future<void> addEventTables() async {
-    if (!_hasNewTables()) return;
+  Future<bool> addEventTables() async {
+    if (!_hasNewTables()) return false;
 
     final newTables = eventTables.where((table) => table.id == 0).toList();
     final result = await _eventService.addEventTables(
@@ -106,19 +106,20 @@ class ManageEventController extends GetxController {
 
     if (result.success) {
       Get.snackbar('Success', 'Mesas agregadas correctamente');
-      Get.back();
+      return true;
     } else {
       Get.snackbar('Error', result.message ?? 'Error al agregar mesas');
     }
+    return false;
   }
 
-  Future<void> updateData() async {
+  Future<bool> updateData() async {
     final bool hasFormChanges = _hasFormChanges();
     final bool hasNewTables = _hasNewTables();
 
     if (!hasFormChanges && !hasNewTables) {
       Get.snackbar('Info', 'No hay cambios para guardar');
-      return;
+      return false;
     }
 
     if (hasFormChanges) {
@@ -152,18 +153,19 @@ class ManageEventController extends GetxController {
       final result = await _eventService.updateEvent(data: updatedEvent);
       if (result.success) {
         Get.snackbar('Success', 'Evento actualizado correctamente');
-        Get.back();
+        return true;
       } else {
         Get.snackbar('Error', result.message ?? 'Error al actualizar evento');
       }
     } else {
-      addEventTables();
+      return addEventTables();
     }
+    return false;
   }
 
-  Future<void> saveData() async {
+  Future<bool> saveData() async {
     if (selectedData != null) {
-      updateData();
+      return updateData();
     } else {
       // Create new event
       final newEvent = EventModel(
@@ -193,11 +195,12 @@ class ManageEventController extends GetxController {
       final result = await _eventService.createEvent(data: newEvent);
       if (result.success) {
         Get.snackbar('Success', 'Event created successfully');
-        Get.back();
+        return true;
       } else {
         Get.snackbar('Error', result.message ?? 'Unknown error');
       }
     }
+    return false;
   }
 
   // Validator functions

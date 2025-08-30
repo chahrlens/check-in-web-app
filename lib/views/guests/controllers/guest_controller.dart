@@ -136,11 +136,11 @@ class ManageGuestController extends GetxController {
     return null;
   }
 
-  Future<void> handleSave() async {
+  Future<bool> handleSave() async {
     try {
       if (selectedEvent == null || reservations.isEmpty) {
         Get.snackbar("Error", "No event selected or no reservations made");
-        return;
+        return false;
       }
       final EventReservation reservation = EventReservation(
         eventId: selectedEvent!.id,
@@ -149,11 +149,14 @@ class ManageGuestController extends GetxController {
       final response = await _eventService.addReservations(reservation);
       if (response.success) {
         Get.snackbar("Success", "Reservations added successfully");
+        return true;
       } else {
         Get.snackbar("Error", response.message ?? "Unknown error");
       }
+      return false;
     } catch (e) {
       Get.snackbar("Error", e.toString());
+      return false;
     }
   }
 

@@ -135,8 +135,8 @@ class _ManageGuestsPageState extends State<ManageGuestsPage> {
                         backgroundColor: Colors.blueAccent,
                       ),
                       onPressed: () async {
-                        await _controller.handleSave();
-                        if (context.mounted) {
+                        final success = await _controller.handleSave();
+                        if (success && context.mounted) {
                           Navigator.of(context).pop();
                         }
                       },

@@ -62,7 +62,7 @@ class _ManageEventPageState extends State<ManageEventPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blueAccent,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (!_formKey.currentState!.validate()) {
                             Get.snackbar(
                               'Error',
@@ -72,7 +72,10 @@ class _ManageEventPageState extends State<ManageEventPage> {
                             _controller.update();
                             return;
                           }
-                          _controller.saveData();
+                          final success = await _controller.saveData();
+                          if (success && context.mounted) {
+                            Navigator.of(context).pop();
+                          }
                         },
                         icon: const Icon(Icons.save),
                         label: Text('Guardar'),

@@ -40,6 +40,7 @@ class EventService extends BaseService {
         headers: {'Content-Type': 'application/json'},
       );
       final apiResponse = ApiResponse.fromResponse(response);
+      debugLog('Create Event Response: ${apiResponse.message}');
       return apiResponse;
     } catch (e) {
       debugLog(e.toString());
