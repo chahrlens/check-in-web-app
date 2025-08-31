@@ -1,19 +1,15 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:qr_check_in/controllers/sidebar/menu_sidebar_controller.dart';
 import 'package:qr_check_in/shared/constants/global_keys.dart';
 import 'package:qr_check_in/shared/helpers/encryption.dart';
 import 'package:qr_check_in/shared/resources/local_storaje.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
-import 'package:qr_check_in/views/login/services/login_service.dart';
 import 'package:qr_check_in/services/auth_service.dart';
 
 
 class SessionController extends GetxController {
   final LocalStorage _storageController = Get.find<LocalStorage>();
-  final MenuSidebarController _menuController =
-      Get.find<MenuSidebarController>();
   final AuthService _authService = Get.find<AuthService>();
 
   var username = ''.obs;
@@ -70,8 +66,7 @@ class SessionController extends GetxController {
       token.value = '';
       userId.value = '';
 
-      MenuSidebarController menuController = Get.find();
-      menuController.menu.clear();
+      // Limpieza de la sesión
       //Clear local storage
       await Future.wait([
         _storageController.removeElement(GlobalKeys.tokenKey),
@@ -108,40 +103,53 @@ class SessionController extends GetxController {
 
   Future<bool> _getSessionStorage() async {
     try {
-      if (getUserId != 0) {
-        return true;
-      }
       isLoading.value = true;
-      final LoginService loginService = LoginService();
       final results = await Future.wait([
         _storageController.getString(GlobalKeys.tokenKey),
         _storageController.getString(GlobalKeys.userIdKey),
       ]);
       final sessionToken = results[0];
-      final userId = results[1];
-      final tokenIsValid = this.tokenIsValid(sessionToken);
-      if (tokenIsValid && userId != null) {
-        final user = await loginService.retrieveUserData(sessionToken!, userId);
-        if (user != null) {
-          await _storageController.removeElement(GlobalKeys.tokenKey);
-          await _storageController.setStringValues({
-            GlobalKeys.tokenKey: user.token,
-          });
-          // setSession(
-          //   username: user.username,
-          //   token: sessionToken,
-          //   userId: user.id,
-          //   role: user.role!,
-          //   person: user.person!,
-          //   group: user.group!,
-          // );
-          _menuController.loadMenu(user.role!.name);
-          return true;
-        }
+      final storedUserId = results[1];
+
+      // Si no hay token o userId almacenados, no hay sesión válida
+      if (sessionToken == null || storedUserId == null) {
+        await logOut();  // Aseguramos limpiar todo
+        return false;
       }
-      return false;
+
+      // Verificar si el token es válido
+      if (!tokenIsValid(sessionToken)) {
+        await logOut();  // Limpiamos la sesión si el token expiró
+        return false;
+      }
+
+      // Actualizar el estado de la sesión con los valores almacenados
+      setToken(sessionToken);
+      setUserId(storedUserId);
+
+      // Intentar renovar el token con Firebase
+      try {
+        final currentUser = _authService.getCurrentUser();
+        if (currentUser != null) {
+          final newToken = await currentUser.getIdToken(true); // true fuerza la renovación
+          if (newToken != null) {
+            setToken(newToken);
+            await _storageController.setString(GlobalKeys.tokenKey, newToken);
+          }
+          setUsername(currentUser.email ?? '');
+          return true;
+        } else {
+          await logOut();  // Si no hay usuario en Firebase, limpiamos la sesión
+          return false;
+        }
+      } catch (e) {
+        debugLog('Error renovando token: $e');
+        await logOut();
+        return false;
+      }
     } catch (e) {
       debugLog('Error in getSessionStorage: $e');
+      await logOut();
       return false;
     } finally {
       isLoading.value = false;

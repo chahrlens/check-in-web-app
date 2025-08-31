@@ -36,11 +36,14 @@ class MyApp extends StatelessWidget {
         initialRoute: RouteConstants.login,
         title: 'Qr Check In',
         debugShowCheckedModeBanner: false,
-        getPages: [
-          ...PRIMARY_ROUTING_PATHS,
-          // Add any additional routes here
-        ],
+        defaultTransition: Transition.fadeIn,
+        getPages: PRIMARY_ROUTING_PATHS,
         theme: appTheme,
+        routingCallback: (routing) {
+          if (routing?.current != null) {
+            debugPrint('ROUTE CALLED: ${routing?.current}');
+          }
+        },
       ),
     );
   }

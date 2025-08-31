@@ -15,7 +15,9 @@ class AuthService extends GetxController {
     user.bindStream(_auth.authStateChanges());
   }
 
-  Future<UserCredential?> signInWithEmailAndPassword(
+  User? getCurrentUser() {
+    return _auth.currentUser;
+  }  Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
       final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
