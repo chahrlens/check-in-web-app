@@ -218,6 +218,47 @@ class ResponsiveSimpleLayout extends StatelessWidget {
     this.showBackButton = false,
   });
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cerrar sesión'),
+          content: const Text('¿Está seguro que desea cerrar sesión?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _handleLogout();
+              },
+              child: const Text('Cerrar sesión'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      final sessionController = Get.find<SessionController>();
+      await sessionController.logOut();
+      Get.offAllNamed(RouteConstants.login);
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'No se pudo cerrar la sesión: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -237,6 +278,13 @@ class ResponsiveSimpleLayout extends StatelessWidget {
                   },
                 )
               : null,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () => _showLogoutDialog(context),
+              tooltip: 'Cerrar sesión',
+            ),
+          ],
           backgroundColor: colorScheme.primary,
           elevation: 0.5,
           automaticallyImplyLeading: false,

@@ -55,3 +55,6 @@ web/build/
 macos/Flutter/GeneratedPluginRegistrant.swift
 macos/Flutter/GeneratedPluginRegistrant.swift
 .firebase/**
+
+# Firebase configuration
+lib/config/firebase_options.dart

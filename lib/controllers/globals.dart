@@ -7,16 +7,18 @@ import 'package:qr_check_in/shared/helpers/encryption.dart';
 import 'package:qr_check_in/shared/resources/local_storaje.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
 import 'package:qr_check_in/views/login/services/login_service.dart';
+import 'package:qr_check_in/services/auth_service.dart';
 
 
 class SessionController extends GetxController {
   final LocalStorage _storageController = Get.find<LocalStorage>();
   final MenuSidebarController _menuController =
       Get.find<MenuSidebarController>();
+  final AuthService _authService = Get.find<AuthService>();
 
   var username = ''.obs;
   var token = ''.obs;
-  var userId = 0.obs;
+  var userId = ''.obs; // Changed to String for Firebase UID compatibility
 
 
   RxBool isLoading = false.obs;
@@ -35,50 +37,49 @@ class SessionController extends GetxController {
     token.value = value;
   }
 
-  void setUserId(int id) {
+  void setUserId(String id) {
     userId.value = id;
   }
 
-  // // Método para establecer todo junto (por ejemplo, al hacer login)
-  // void setSession(
-  //     {required String username,
-  //     required String token,
-  //     required int userId,
-  //     required RoleModel role,
-  //     required PersonModel person,
-  //     SimpleEntity? group}) {
-  //   this.username.value = username;
-  //   this.token.value = token;
-  //   this.userId.value = userId;
-  //   this.role.value = role;
-  //   this.person.value = person;
-  //   this.group.value = group ?? SimpleEntity(id: "", name: "");
-  //   debugLog(
-  //       "SessionController: setSession called with username: ${this.group.value.name}, role:");
-  // }
-
   // Métodos para acceder si quieres usar sin `.value`
   String get getUsername => username.value;
-  // String get fullName => '${person.value.firstName} ${person.value.lastName}';
   String get getToken => token.value;
-  int get getUserId => userId.value;
+  String get getUserId => userId.value;
+
+  Future<bool> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      final userCredential = await _authService.signInWithEmailAndPassword(email, password);
+      if (userCredential != null) {
+        setUsername(email);
+        setUserId(userCredential.user!.uid);
+        final idToken = await userCredential.user!.getIdToken();
+        setToken(idToken ?? '');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugLog('Error signing in: $e');
+      return false;
+    }
+  }
 
   Future<void> logOut() async {
-    // Aquí puedes limpiar las variables o hacer cualquier otra acción necesaria al cerrar sesión
-    username.value = '';
-    token.value = '';
-    userId.value = 0;
-    // role.value = RoleModel(id: 0, name: '');
-    // person.value = PersonModel(id: 0, firstName: '', lastName: '');
-    // group.value = SimpleEntity(id: "", name: "");
+    try {
+      await _authService.signOut();
+      username.value = '';
+      token.value = '';
+      userId.value = '';
 
-    MenuSidebarController menuController = Get.find();
-    menuController.menu.clear();
-    //Clear local storage
-    await Future.wait([
-      _storageController.removeElement(GlobalKeys.tokenKey),
-      _storageController.removeElement(GlobalKeys.userIdKey),
-    ]);
+      MenuSidebarController menuController = Get.find();
+      menuController.menu.clear();
+      //Clear local storage
+      await Future.wait([
+        _storageController.removeElement(GlobalKeys.tokenKey),
+        _storageController.removeElement(GlobalKeys.userIdKey),
+      ]);
+    } catch (e) {
+      debugLog('Error signing out: $e');
+    }
   }
 
   Map<String, String> generateEncryptedHeaders() {
