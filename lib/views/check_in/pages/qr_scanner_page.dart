@@ -13,6 +13,7 @@ class QrScannerPage extends StatefulWidget {
 
 class _QrScannerPageState extends State<QrScannerPage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  bool canPop = true;
   Barcode? result;
   QRViewController? controller;
   int qrViewKey = 0;
@@ -40,7 +41,8 @@ class _QrScannerPageState extends State<QrScannerPage> {
       setState(() {
         result = scanData;
       });
-      if (scanData.code != null && scanData.code!.isNotEmpty) {
+      if (canPop && scanData.code != null && scanData.code!.isNotEmpty) {
+        canPop = false;
         Navigator.of(context).pop(scanData.code);
       }
     });
@@ -112,7 +114,9 @@ class _QrScannerPageState extends State<QrScannerPage> {
                           child: FutureBuilder(
                             future: controller?.getFlashStatus(),
                             builder: (context, snapshot) {
-                              return Text('Flash: ${snapshot.data == true ? 'On' : 'Off'}');
+                              return Text(
+                                'Flash: ${snapshot.data == true ? 'On' : 'Off'}',
+                              );
                             },
                           ),
                         ),
@@ -128,9 +132,13 @@ class _QrScannerPageState extends State<QrScannerPage> {
                             future: controller?.getCameraInfo(),
                             builder: (context, snapshot) {
                               if (snapshot.data != null) {
-                                return Text('Cámara: ${describeEnum(snapshot.data!)}');
+                                return Text(
+                                  'Cámara: ${describeEnum(snapshot.data!)}',
+                                );
                               } else {
-                                return const Text('Solo una cámara disponible o no soportado');
+                                return const Text(
+                                  'Solo una cámara disponible o no soportado',
+                                );
                               }
                             },
                           ),

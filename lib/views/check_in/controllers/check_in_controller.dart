@@ -8,7 +8,7 @@ class CheckInController extends GetxController {
   final tableNumber = TextEditingController();
   final reservedSpaces = TextEditingController();
   final quantityAvailable = TextEditingController();
-  final quantity = TextEditingController();
+  final quantity = TextEditingController(text: '1');
   final guestPhone = TextEditingController();
   final guestDpi = TextEditingController();
   final CheckInService _checkInService = CheckInService();
