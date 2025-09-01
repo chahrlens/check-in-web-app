@@ -156,6 +156,20 @@ class EventsTableCard extends StatelessWidget {
                               icon: Icon(Icons.more_vert),
                               itemBuilder: (context) => [
                                 PopupMenuItem(
+                                  value: 0,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.print,
+                                        color: Colors.lightBlue,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Imprimir por mesa'),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuDivider(),
+                                PopupMenuItem(
                                   value: 1,
                                   child: Row(
                                     children: [
@@ -178,9 +192,28 @@ class EventsTableCard extends StatelessWidget {
                                     ],
                                   ),
                                 ),
+                                PopupMenuDivider(),
+                                PopupMenuItem(
+                                  value: 3,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.person_remove,
+                                        color: Colors.redAccent,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Eliminar invitados'),
+                                    ],
+                                  ),
+                                ),
                               ],
                               onSelected: (value) {
-                                if (value == 1) {
+                                if (value == 0) {
+                                  Get.toNamed(
+                                    RouteConstants.printInvitations,
+                                    arguments: {'data': item},
+                                  );
+                                } else if (value == 1) {
                                   Get.toNamed(
                                     RouteConstants.manageEvent,
                                     arguments: {'data': item, 'isEdit': true},

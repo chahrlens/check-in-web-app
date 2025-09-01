@@ -5,4 +5,5 @@ class RouteConstants {
   static const String manageEvent = '$event/manage-event';
   static const String manageGuests = '$event/manage-guests';
   static const String checkIn = '$event/check-in';
+  static const String printInvitations = '$event/print-invitations';
 }
