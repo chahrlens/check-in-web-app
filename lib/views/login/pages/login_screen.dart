@@ -36,7 +36,10 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      final success = await sessionController.signInWithEmailAndPassword(email, password);
+      final success = await sessionController.signInWithEmailAndPassword(
+        email,
+        password,
+      );
 
       if (!mounted) return;
 
@@ -59,12 +62,14 @@ class _LoginPageState extends State<LoginPage> {
         actions: [
           TextButton(
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
-              foregroundColor: MaterialStateProperty.all(Colors.white),
+              backgroundColor: WidgetStateProperty.all(
+                Theme.of(context).primaryColor,
+              ),
+              foregroundColor: WidgetStateProperty.all(Colors.white),
             ),
             child: const Text('OK'),
             onPressed: () => Navigator.pop(context),
-          )
+          ),
         ],
       ),
     );
@@ -87,78 +92,82 @@ class _LoginPageState extends State<LoginPage> {
         child: Center(
           child: Card(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             margin: const EdgeInsets.symmetric(horizontal: 30),
             child: Padding(
               padding: const EdgeInsets.all(24.0),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Column(
-                      children: [
-                        Icon(
-                          Icons.verified_user,
-                          size: 80,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'QR Check-In',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.verified_user,
+                            size: 80,
                             color: colorScheme.primary,
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Sistema de Control de Acceso',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: colorScheme.secondary,
+                          const SizedBox(height: 16),
+                          Text(
+                            'QR Check-In',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Contraseña',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                      ),
-                      onSubmitted: (_) => _login(),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: colorScheme.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Sistema de Control de Acceso',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: colorScheme.secondary,
+                            ),
                           ),
-                        ),
-                        child: const Text('Entrar'),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.email),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Contraseña',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.lock),
+                        ),
+                        onSubmitted: (_) => _login(),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _login,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            backgroundColor: colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text('Entrar'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
