@@ -93,41 +93,80 @@ class _QRPrintPageState extends State<QRPrintPage> {
                     maxWidth: double.infinity,
                     minWidth: 0.0,
                     minHeight: 150.0,
-                    child: Obx(() {
-                      final selectedTable = _controller.selectedTable.value;
-                      if (selectedTable == null) {
-                        return Center(
-                          child: Text(
-                            'Selecciona una mesa para ver sus reservaciones.',
-                          ),
-                        );
-                      }
-                      // Filtrar las reservaciones por la mesa seleccionada
-                      final reservations =
-                          _controller.selectedData?.reservations
-                              .where((r) => r.tableId == selectedTable.id)
-                              .toList() ??
-                          [];
-                      if (reservations.isEmpty) {
-                        return Center(
-                          child: Text('No hay reservaciones para esta mesa.'),
-                        );
-                      }
-                      return SizedBox(
-                        width: double.infinity,
-                        child: Wrap(
-                          spacing: 8.0,
-                          runSpacing: 8.0,
-                          alignment: WrapAlignment.spaceAround,
-                          children: reservations.map((reservation) {
-                            return SizedBox(
-                              width: cardWidth,
-                              child: PrintCardWidget(reservation: reservation),
+                    child: Column(
+                      children: [
+                        Obx(() {
+                          final selectedTable = _controller.selectedTable.value;
+                          if (selectedTable == null) {
+                            return Center(
+                              child: Text(
+                                'Selecciona una mesa para ver sus reservaciones.',
+                              ),
                             );
-                          }).toList(),
-                        ),
-                      );
-                    }),
+                          }
+                          // Filtrar las reservaciones por la mesa seleccionada
+                          final reservations =
+                              _controller.selectedData?.reservations
+                                  .where((r) => r.tableId == selectedTable.id)
+                                  .toList() ??
+                              [];
+                          if (reservations.isEmpty) {
+                            return Center(
+                              child: Text(
+                                'No hay reservaciones para esta mesa.',
+                              ),
+                            );
+                          }
+                          return SizedBox(
+                            width: double.infinity,
+                            child: Wrap(
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              alignment: WrapAlignment.spaceAround,
+                              children: reservations.map((reservation) {
+                                return SizedBox(
+                                  width: cardWidth,
+                                  child: PrintCardWidget(
+                                    reservation: reservation,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: 12),
+                        Obx(() {
+                          if (_controller.selectedTable.value == null) {
+                            return const SizedBox.shrink();
+                          }
+                          return Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                right: 16.0,
+                                bottom: 16.0,
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: () =>
+                                    _controller.printTableQrCodes(),
+                                icon: Icon(
+                                  Icons.print_rounded,
+                                  color: Colors.white,
+                                ),
+                                label: Text('Imprimir Mesa Completa'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueAccent,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
                   ),
                 ),
               ],

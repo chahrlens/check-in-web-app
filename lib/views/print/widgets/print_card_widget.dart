@@ -1,10 +1,13 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_check_in/models/event_model.dart';
+import 'package:qr_check_in/views/print/controllers/qr_print_controller.dart';
 
 class PrintCardWidget extends StatelessWidget {
-  const PrintCardWidget({super.key, required this.reservation});
+  PrintCardWidget({super.key, required this.reservation});
 
   final Reservation reservation;
+  final QrPrintController controller = Get.find<QrPrintController>();
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +50,7 @@ class PrintCardWidget extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Acción de imprimir aquí
-                },
+                onPressed: () => controller.printSingleQrCode(reservation),
                 icon: Icon(Icons.print, color: Colors.white),
                 label: Text('Imprimir'),
                 style: ElevatedButton.styleFrom(
