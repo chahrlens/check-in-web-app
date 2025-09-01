@@ -1,15 +1,28 @@
 import 'dart:convert';
-
+import 'package:get/get.dart';
 import 'package:qr_check_in/models/either.dart';
+import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/models/event_model.dart';
 import 'package:qr_check_in/models/api_response.dart';
 import 'package:qr_check_in/services/base_service.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
 
 class EventService extends BaseService {
+  final SessionController _sessionController = Get.find<SessionController>();
+  Map<String, String> get _authHeaders {
+    final token = _sessionController.token.value;
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
+
   Future<Either<List<EventModel>?, ApiResponse>> getEvents() async {
     try {
-      final response = await httpClient.get(buildUri('/event/v1/events'));
+      final response = await httpClient.get(
+        buildUri('/event/v1/events'),
+        headers: _authHeaders,
+      );
       final apiResponse = ApiResponse.fromResponse(response);
       if (response.statusCode == 200) {
         final decodedJson = json.decode(response.body);
@@ -37,7 +50,7 @@ class EventService extends BaseService {
       final response = await httpClient.post(
         buildUri('/event/v1/events'),
         body: json.encode(body),
-        headers: {'Content-Type': 'application/json'},
+        headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
       debugLog('Create Event Response: ${apiResponse.message}');
@@ -58,7 +71,7 @@ class EventService extends BaseService {
       final response = await httpClient.put(
         buildUri('/event/v1/events'),
         body: json.encode(body),
-        headers: {'Content-Type': 'application/json'},
+        headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
       return apiResponse;
@@ -84,7 +97,7 @@ class EventService extends BaseService {
       final response = await httpClient.post(
         buildUri('/event/v1/events/tables'),
         body: json.encode(jsonData),
-        headers: {'Content-Type': 'application/json'},
+        headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
       return apiResponse;
@@ -103,7 +116,7 @@ class EventService extends BaseService {
       final response = await httpClient.post(
         buildUri('/event/v1/events/reservations'),
         body: json.encode(reservations.toJson()),
-        headers: {'Content-Type': 'application/json'},
+        headers: _authHeaders,
       );
       return ApiResponse.fromResponse(response);
     } catch (e) {
@@ -120,6 +133,7 @@ class EventService extends BaseService {
     try {
       final response = await httpClient.delete(
         buildUri('/event/v1/events/', queryParameters: {"eventId": eventId}),
+        headers: _authHeaders,
       );
       return ApiResponse.fromResponse(response);
     } catch (e) {
@@ -137,7 +151,7 @@ class EventService extends BaseService {
       final response = await httpClient.delete(
         buildUri('/event/v1/events/reservations'),
         body: json.encode({"reservationIds": reservationIds}),
-        headers: {'Content-Type': 'application/json'},
+        headers: _authHeaders,
       );
       return ApiResponse.fromResponse(response);
     } catch (e) {

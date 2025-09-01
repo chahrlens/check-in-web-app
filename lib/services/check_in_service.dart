@@ -1,18 +1,30 @@
 import 'dart:convert';
+import 'package:get/get.dart';
 import 'package:qr_check_in/models/either.dart';
+import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/models/api_response.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
 import 'package:qr_check_in/models/check_in_model.dart';
 import 'package:qr_check_in/services/base_service.dart';
 
 class CheckInService extends BaseService {
+  final SessionController _sessionController = Get.find<SessionController>();
+
+  Map<String, String> get _authHeaders {
+    final token = _sessionController.token.value;
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
+
   Future<Either<CheckInModel?, ApiResponse>> getCheckInDetails(
     String uuid,
   ) async {
     try {
       final response = await httpClient.get(
         buildUri('/check-in/v1/availability/$uuid'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
       if (response.statusCode == 200) {
@@ -48,7 +60,7 @@ class CheckInService extends BaseService {
       final response = await httpClient.post(
         buildUri('/check-in/v1/check-in'),
         body: json.encode(body),
-        headers: {'Content-Type': 'application/json'},
+        headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
       return apiResponse;

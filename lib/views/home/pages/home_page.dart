@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_check_in/observers/route_observer.dart';
 import 'package:qr_check_in/widgets/layout/content_card.dart';
 import 'package:qr_check_in/widgets/commons/fixed_container.dart';
 import 'package:qr_check_in/widgets/layout/responsive_layout.dart';
@@ -15,7 +16,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with RouteAware {
   late HomeController _controller;
 
   void _start() async {
@@ -30,8 +31,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didPopNext() {
+    _start();
+    super.didPopNext();
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
+    routeObserver.unsubscribe(this);
     super.dispose();
   }
 
