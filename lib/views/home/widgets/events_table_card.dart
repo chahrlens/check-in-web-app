@@ -202,7 +202,7 @@ class EventsTableCard extends StatelessWidget {
                                         color: Colors.redAccent,
                                       ),
                                       SizedBox(width: 8),
-                                      Text('Eliminar invitados'),
+                                      Text('Eliminar invitación'),
                                     ],
                                   ),
                                 ),
@@ -221,6 +221,11 @@ class EventsTableCard extends StatelessWidget {
                                 } else if (value == 2) {
                                   Get.toNamed(
                                     RouteConstants.manageGuests,
+                                    arguments: {'data': item},
+                                  );
+                                } else if (value == 3) {
+                                  Get.toNamed(
+                                    RouteConstants.removePasses,
                                     arguments: {'data': item},
                                   );
                                 }

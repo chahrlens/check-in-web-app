@@ -131,4 +131,22 @@ class EventService extends BaseService {
       );
     }
   }
+
+  Future<ApiResponse> deleteReservations(List<int> reservationIds) async {
+    try {
+      final response = await httpClient.delete(
+        buildUri('/event/v1/events/reservations'),
+        body: json.encode({"reservationIds": reservationIds}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      return ApiResponse.fromResponse(response);
+    } catch (e) {
+      debugLog(e.toString());
+      return ApiResponse(
+        statusCode: 500,
+        success: false,
+        message: 'An error occurred',
+      );
+    }
+  }
 }

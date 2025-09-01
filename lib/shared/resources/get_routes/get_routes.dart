@@ -7,6 +7,7 @@ import 'package:qr_check_in/views/home/pages/home_page.dart';
 import 'package:qr_check_in/views/manage_event/pages/event_page.dart';
 import 'package:qr_check_in/views/login/pages/login_screen.dart';
 import 'package:qr_check_in/views/print/pages/qr_print_page.dart';
+import 'package:qr_check_in/views/remove_passes/pages/remove_passes_page.dart';
 
 // ignore: non_constant_identifier_names
 final List<GetPage<dynamic>> PRIMARY_ROUTING_PATHS = [
@@ -42,6 +43,12 @@ final List<GetPage<dynamic>> PRIMARY_ROUTING_PATHS = [
   GetPage(
     name: RouteConstants.printInvitations,
     page: () => const QRPrintPage(),
+    middlewares: [AuthMiddleware()],
+    transition: Transition.fadeIn,
+  ),
+  GetPage(
+    name: RouteConstants.removePasses,
+    page: () => const RemovePassesPage(),
     middlewares: [AuthMiddleware()],
     transition: Transition.fadeIn,
   ),
