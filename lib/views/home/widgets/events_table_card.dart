@@ -65,133 +65,136 @@ class EventsTableCard extends StatelessWidget {
                       context,
                     ),
                     DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStateProperty.all<Color>(
-                                Colors.yellow,
-                              ),
-                            ),
-                            icon: Tooltip(
-                              message: 'Editar evento',
-                              child: Icon(Icons.edit),
-                            ),
-                            onPressed: () {
-                              Get.toNamed(
-                                RouteConstants.manageEvent,
-                                arguments: {'isEdit': true, 'data': item},
-                              );
-                            },
-                          ),
-                          IconButton(
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStateProperty.all<Color>(
-                                Colors.blue,
-                              ),
-                            ),
-                            onPressed: () =>
-                                QRPrintService.openPrintWindow(item),
-                            icon: const Tooltip(
-                              message: 'Imprimir pase a invitados',
-                              child: Icon(Icons.print),
-                            ),
-                          ),
-                          IconButton(
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStateProperty.all<Color>(
-                                Colors.red,
-                              ),
-                            ),
-                            icon: Tooltip(
-                              message: 'Finalizar evento',
-                              child: Icon(Icons.check_circle),
-                            ),
-                            onPressed: () {
-                              // controller.deleteEvent(item.id);
-                              //Modal confirmation
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Confirmar eliminación'),
-                                    content: Text(
-                                      '¿Estás seguro de que deseas eliminar este evento?',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        style: ButtonStyle(
-                                          foregroundColor:
-                                              WidgetStateProperty.all<Color>(
-                                                Colors.blueAccent,
-                                              ),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        style: ButtonStyle(
-                                          foregroundColor:
-                                              WidgetStateProperty.all<Color>(
-                                            Colors.red,
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          controller.deleteEvent(item.id);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('Eliminar'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                          PopupMenuButton<int>(
-                            icon: Icon(Icons.more_vert),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: 1,
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.add, color: Colors.lightBlue),
-                                    SizedBox(width: 8),
-                                    Text('Agregar mesas'),
-                                  ],
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              style: ButtonStyle(
+                                foregroundColor: WidgetStateProperty.all<Color>(
+                                  Colors.yellow,
                                 ),
                               ),
-                              PopupMenuItem(
-                                value: 2,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.person_add,
-                                      color: Colors.lightBlue,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text('Agregar invitados'),
-                                  ],
-                                ),
+                              icon: Tooltip(
+                                message: 'Editar evento',
+                                child: Icon(Icons.edit),
                               ),
-                            ],
-                            onSelected: (value) {
-                              if (value == 1) {
+                              onPressed: () {
                                 Get.toNamed(
                                   RouteConstants.manageEvent,
-                                  arguments: {'data': item, 'isEdit': true},
+                                  arguments: {'isEdit': true, 'data': item},
                                 );
-                              } else if (value == 2) {
-                                Get.toNamed(
-                                  RouteConstants.manageGuests,
-                                  arguments: {'data': item},
+                              },
+                            ),
+                            IconButton(
+                              style: ButtonStyle(
+                                foregroundColor: WidgetStateProperty.all<Color>(
+                                  Colors.blue,
+                                ),
+                              ),
+                              onPressed: () =>
+                                  QRPrintService.openPrintWindow(item),
+                              icon: const Tooltip(
+                                message: 'Imprimir pase a invitados',
+                                child: Icon(Icons.print),
+                              ),
+                            ),
+                            IconButton(
+                              style: ButtonStyle(
+                                foregroundColor: WidgetStateProperty.all<Color>(
+                                  Colors.red,
+                                ),
+                              ),
+                              icon: Tooltip(
+                                message: 'Finalizar evento',
+                                child: Icon(Icons.check_circle),
+                              ),
+                              onPressed: () {
+                                // controller.deleteEvent(item.id);
+                                //Modal confirmation
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Confirmar eliminación'),
+                                      content: Text(
+                                        '¿Estás seguro de que deseas eliminar este evento?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          style: ButtonStyle(
+                                            foregroundColor:
+                                                WidgetStateProperty.all<Color>(
+                                                  Colors.blueAccent,
+                                                ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Cancelar'),
+                                        ),
+                                        TextButton(
+                                          style: ButtonStyle(
+                                            foregroundColor:
+                                                WidgetStateProperty.all<Color>(
+                                                  Colors.red,
+                                                ),
+                                          ),
+                                          onPressed: () {
+                                            controller.deleteEvent(item.id);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Eliminar'),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
-                              }
-                            },
-                          ),
-                        ],
+                              },
+                            ),
+                            PopupMenuButton<int>(
+                              icon: Icon(Icons.more_vert),
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 1,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.add, color: Colors.lightBlue),
+                                      SizedBox(width: 8),
+                                      Text('Agregar mesas'),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 2,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.person_add,
+                                        color: Colors.lightBlue,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Agregar invitados'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              onSelected: (value) {
+                                if (value == 1) {
+                                  Get.toNamed(
+                                    RouteConstants.manageEvent,
+                                    arguments: {'data': item, 'isEdit': true},
+                                  );
+                                } else if (value == 2) {
+                                  Get.toNamed(
+                                    RouteConstants.manageGuests,
+                                    arguments: {'data': item},
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

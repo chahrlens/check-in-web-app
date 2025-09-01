@@ -93,7 +93,10 @@ class CheckInController extends GetxController {
     quantity.clear();
     guestPhone.clear();
     guestDpi.clear();
+    reservedSpaces.clear();
     checkInData = null;
+    guestIsArrived.value = false;
+    guestEntered.value = false;
   }
 
   /// Realiza el proceso de check-in

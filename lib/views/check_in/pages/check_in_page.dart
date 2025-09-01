@@ -54,14 +54,18 @@ class _CheckInPageState extends State<CheckInPage>
                 children: [
                   ContentCard(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildQrInputOptions(context),
-                            if (_controller.isLoading.value)
-                              const CircularProgressIndicator(),
-                          ],
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildQrInputOptions(context),
+                              if (_controller.isLoading.value)
+                                const CircularProgressIndicator(),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 20),
                         Wrap(
@@ -191,7 +195,7 @@ class _CheckInPageState extends State<CheckInPage>
                                               final success = await _controller
                                                   .performCheckIn(context);
                                               if (success && context.mounted) {
-                                                Navigator.of(context).pop();
+                                                _controller.clearFields();
                                               }
                                             }
                                           },

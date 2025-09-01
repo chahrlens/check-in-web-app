@@ -42,6 +42,10 @@ class _HomePageState extends State<HomePage> {
       description: 'Bienvenido a la aplicación de Check-In',
       content: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
+          final bool isMaximized = constraints.maxWidth > 600;
+          final responsiveWidth = isMaximized
+              ? (constraints.maxWidth * 1 / 3) * 0.8
+              : constraints.maxWidth * 0.8;
           return SingleChildScrollView(
             child: Column(
               children: [
@@ -55,40 +59,46 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         CustomInputWidget(
-                          width: constraints.maxWidth * 1 / 3,
+                          width: responsiveWidth,
                           controller: _controller.searchCtrl,
                           label: 'Buscar',
                           hintText: 'Ingresa tu búsqueda',
                           prefixIcon: Icons.search,
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                Get.toNamed(
-                                  RouteConstants.manageEvent,
-                                  arguments: {'isEdit': false},
-                                );
-                              },
-                              icon: const Icon(Icons.add),
-                              label: const Text('Agregar evento'),
+                        SizedBox(
+                          width: responsiveWidth,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    Get.toNamed(
+                                      RouteConstants.manageEvent,
+                                      arguments: {'isEdit': false},
+                                    );
+                                  },
+                                  icon: const Icon(Icons.add),
+                                  label: const Text('Agregar evento'),
+                                ),
+                                const SizedBox(width: 12),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    Get.toNamed(RouteConstants.checkIn);
+                                  },
+                                  icon: const Icon(Icons.check),
+                                  label: const Text('Check-In'),
+                                ),
+                                const SizedBox(width: 24),
+                                ElevatedButton.icon(
+                                  onPressed: _start,
+                                  icon: const Icon(Icons.refresh),
+                                  label: const Text('Reiniciar'),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                Get.toNamed(RouteConstants.checkIn);
-                              },
-                              icon: const Icon(Icons.check),
-                              label: const Text('Check-In'),
-                            ),
-                            const SizedBox(width: 24),
-                            ElevatedButton.icon(
-                              onPressed: _start,
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Reiniciar'),
-                            ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
