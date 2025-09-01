@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_check_in/models/check_in_model.dart';
 import 'package:qr_check_in/services/check_in_service.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 
 class CheckInController extends GetxController {
   final userName = TextEditingController();
@@ -50,17 +51,27 @@ class CheckInController extends GetxController {
         checkInData = result.left;
         _fillCheckInDataFields();
         hasError.value = false;
+        ToastService.success(
+          title: 'Éxito',
+          message: 'Datos del check-in obtenidos con éxito',
+        );
       } else {
         // Error al obtener los datos
         checkInData = null;
         hasError.value = true;
         errorMessage.value = result.right.message ?? 'Error desconocido';
-        _showMessage(context, result.right.message ?? 'Error desconocido');
+        ToastService.error(
+          title: 'Error',
+          message: result.right.message ?? 'Error desconocido',
+        );
       }
     } catch (e) {
       hasError.value = true;
       errorMessage.value = 'Error al procesar el código QR: $e';
-      _showMessage(context, 'Error al procesar el código QR');
+      ToastService.error(
+        title: 'Error',
+        message: 'Error al procesar el código QR',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -102,7 +113,10 @@ class CheckInController extends GetxController {
   /// Realiza el proceso de check-in
   Future<bool> performCheckIn(BuildContext context) async {
     if (checkInData == null || currentQrUuid == null) {
-      _showMessage(context, 'Primero escanee un QR válido');
+      ToastService.error(
+        title: 'Error',
+        message: 'Primero escanee un QR válido',
+      );
       return false;
     }
 
@@ -110,7 +124,10 @@ class CheckInController extends GetxController {
     final available = checkInData!.companions.remaining;
 
     if (qty < 0 || qty > available) {
-      _showMessage(context, 'Cantidad inválida o excede las disponibles');
+      ToastService.error(
+        title: 'Error',
+        message: 'Cantidad inválida o excede las disponibles',
+      );
       return false;
     }
 
@@ -127,14 +144,23 @@ class CheckInController extends GetxController {
       if (response.success) {
         // Actualizar datos locales después del check-in exitoso
         await _refreshCheckInData();
-        _showMessage(context, 'Check-In realizado con éxito');
+        ToastService.success(
+          title: 'Éxito',
+          message: 'Check-In realizado con éxito',
+        );
         return true;
       } else {
-        _showMessage(context, response.message ?? 'Error desconocido');
+        ToastService.error(
+          title: 'Error',
+          message: response.message ?? 'Error desconocido',
+        );
         return false;
       }
     } catch (e) {
-      _showMessage(context, 'Error al realizar Check-In: $e');
+      ToastService.error(
+        title: 'Error',
+        message: 'Error al realizar Check-In: $e',
+      );
       return false;
     } finally {
       isLoading.value = false;
@@ -150,12 +176,5 @@ class CheckInController extends GetxController {
         _fillCheckInDataFields();
       }
     }
-  }
-
-  void _showMessage(BuildContext context, String message, [bool success = true]) {
-    Get.snackbar('Información', message,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: success ? Colors.green[600] : Colors.red[600],
-        colorText: success ? Colors.black : Colors.white);
   }
 }

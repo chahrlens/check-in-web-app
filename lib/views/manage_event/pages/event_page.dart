@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/widgets/layout/content_card.dart';
 import 'package:qr_check_in/widgets/commons/fixed_container.dart';
 import 'package:qr_check_in/widgets/layout/responsive_layout.dart';
@@ -64,9 +65,10 @@ class _ManageEventPageState extends State<ManageEventPage> {
                         ),
                         onPressed: () async {
                           if (!_formKey.currentState!.validate()) {
-                            Get.snackbar(
-                              'Error',
-                              'Por favor completa todos los campos requeridos para continuar.',
+                            ToastService.error(
+                              title: 'Error',
+                              message:
+                                  'Por favor completa todos los campos requeridos para continuar.',
                             );
                             _controller.autovalidateMode = true;
                             _controller.update();

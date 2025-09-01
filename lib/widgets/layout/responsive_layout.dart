@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'navigation_sidebar.dart';
 import 'package:flutter/material.dart';
 import '../commons/global_loader_widget.dart';
@@ -249,12 +250,9 @@ class ResponsiveSimpleLayout extends StatelessWidget {
       await sessionController.logOut();
       Get.offAllNamed(RouteConstants.login);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'No se pudo cerrar la sesión: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      ToastService.error(
+        title: 'Error',
+        message: 'No se pudo cerrar la sesión: ${e.toString()}',
       );
     }
   }
@@ -270,7 +268,8 @@ class ResponsiveSimpleLayout extends StatelessWidget {
               ? IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    if (!Navigator.of(context).canPop() || ModalRoute.of(context)?.isFirst == true) {
+                    if (!Navigator.of(context).canPop() ||
+                        ModalRoute.of(context)?.isFirst == true) {
                       Get.offAllNamed(RouteConstants.dashboard);
                     } else {
                       Navigator.of(context).pop();

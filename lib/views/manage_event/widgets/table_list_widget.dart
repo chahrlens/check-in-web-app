@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/views/manage_event/widgets/modal_table_form.dart';
 import 'package:qr_check_in/views/manage_event/controllers/event_controller.dart';
 
@@ -21,9 +22,10 @@ class TableListWidget extends StatelessWidget {
               ),
               onPressed: () {
                 if (!_formKey.currentState!.validate()) {
-                  Get.snackbar(
-                    'Error',
-                    'Por favor completa todos los campos requeridos para continuar.',
+                  ToastService.error(
+                    title: 'Error',
+                    message:
+                        'Por favor completa todos los campos requeridos para continuar.',
                   );
                   controller.autovalidateMode = true;
                   controller.update();
@@ -64,7 +66,9 @@ class TableListWidget extends StatelessWidget {
                                 children: [
                                   Text(
                                     table.name,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   Text(
                                     'Mesa ${table.tableNumber}\nCapacidad: ${table.capacity}',
@@ -75,7 +79,8 @@ class TableListWidget extends StatelessWidget {
                             ),
                             IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => controller.removeEventTable(table),
+                              onPressed: () =>
+                                  controller.removeEventTable(table),
                               constraints: BoxConstraints(
                                 minWidth: 40,
                                 minHeight: 40,

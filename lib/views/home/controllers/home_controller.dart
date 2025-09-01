@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 import 'package:qr_check_in/models/event_model.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
 import 'package:qr_check_in/services/event_service.dart';
 
@@ -18,13 +19,16 @@ class HomeController extends GetxController {
       if (result.left != null) {
         events.assignAll(result.left!);
       } else {
-        Get.snackbar('Error', result.right.message ?? 'Failed to fetch events');
+        ToastService.error(
+          title: 'Error',
+          message: result.right.message ?? 'Failed to fetch events',
+        );
       }
       isLoading.value = false;
     } catch (e) {
       isLoading.value = false;
       debugLog(e.toString());
-      Get.snackbar('Error', 'Failed to fetch events');
+      ToastService.error(title: 'Error', message: 'Failed to fetch events');
     }
   }
 
@@ -32,9 +36,15 @@ class HomeController extends GetxController {
     final result = await _eventService.deleteEvent(eventId);
     if (result.success) {
       events.removeWhere((event) => event.id == eventId);
-      Get.snackbar('Success', 'Event deleted successfully');
+      ToastService.success(
+        title: 'Success',
+        message: 'Event deleted successfully',
+      );
     } else {
-      Get.snackbar('Error', result.message ?? 'Failed to delete event');
+      ToastService.error(
+        title: 'Error',
+        message: result.message ?? 'Failed to delete event',
+      );
     }
   }
 

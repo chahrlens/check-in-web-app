@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:qr_check_in/models/event_model.dart';
 import 'package:qr_check_in/services/event_service.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 
 class ManageGuestController extends GetxController {
   //host data
@@ -139,7 +140,10 @@ class ManageGuestController extends GetxController {
   Future<bool> handleSave() async {
     try {
       if (selectedEvent == null || reservations.isEmpty) {
-        Get.snackbar("Error", "No event selected or no reservations made");
+        ToastService.error(
+          title: "Error",
+          message: "No event selected or no reservations made",
+        );
         return false;
       }
       final EventReservation reservation = EventReservation(
@@ -148,14 +152,23 @@ class ManageGuestController extends GetxController {
       );
       final response = await _eventService.addReservations(reservation);
       if (response.success) {
-        Get.snackbar("Success", "Reservations added successfully");
+        ToastService.success(
+          title: "Success",
+          message: "Reservations added successfully",
+        );
         return true;
       } else {
-        Get.snackbar("Error", response.message ?? "Unknown error");
+        ToastService.error(
+          title: "Error",
+          message: response.message ?? "Unknown error",
+        );
       }
       return false;
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      ToastService.error(
+        title: "Error",
+        message: e.toString(),
+      );
       return false;
     }
   }
@@ -225,7 +238,10 @@ class ManageGuestController extends GetxController {
 
   void appendReservation() {
     if (selectedTable.value == null) {
-      Get.snackbar("Error", "Please select a table");
+      ToastService.error(
+        title: "Error",
+        message: "Please select a table",
+      );
       return;
     }
     final ReservationDetails newReservation = ReservationDetails(

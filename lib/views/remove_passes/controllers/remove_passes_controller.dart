@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:qr_check_in/models/event_model.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
 import 'package:qr_check_in/services/event_service.dart';
 
@@ -37,16 +38,22 @@ class RemovePassesController extends GetxController {
         if (response.success) {
           eventTables.remove(table);
           selectedTable.value = null;
-          Get.snackbar('Success', 'Table deleted successfully');
+          ToastService.success(
+            title: 'Success',
+            message: 'Table deleted successfully',
+          );
           return true;
         } else {
-          Get.snackbar('Error', response.message ?? 'Unknown error');
+          ToastService.error(
+            title: 'Error',
+            message: response.message ?? 'Unknown error',
+          );
         }
         isLoading.value = false;
       }
       return false;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete table');
+      ToastService.error(title: 'Error', message: 'Failed to delete table');
       debugLog(e.toString());
       return false;
     }
@@ -60,16 +67,16 @@ class RemovePassesController extends GetxController {
         final result = await _eventService.deleteReservations([reservation.id]);
         if (result.success) {
           selectedData!.reservations.remove(reservation);
-          Get.snackbar('Success', 'Reservation deleted successfully');
+          ToastService.success(title: 'Success', message: 'Reservation deleted successfully');
           return true;
         } else {
-          Get.snackbar('Error', result.message ?? 'Unknown error');
+          ToastService.error(title: 'Error', message: result.message ?? 'Unknown error');
         }
         isLoading.value = false;
       }
       return false;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete reservation');
+      ToastService.error(title: 'Error', message: 'Failed to delete reservation');
       debugLog(e.toString());
       return false;
     }

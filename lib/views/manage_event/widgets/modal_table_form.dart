@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/widgets/commons/fixed_container.dart';
 import 'package:qr_check_in/widgets/inputs/custom_input_widget.dart';
 import 'package:qr_check_in/views/manage_event/controllers/event_controller.dart';
@@ -114,9 +115,9 @@ class ModalTableForm extends StatelessWidget {
                                   capacity:
                                       int.tryParse(capacityCtrl.text) ?? 0,
                                 );
-                                Get.snackbar(
-                                  'Éxito',
-                                  'Mesa agregada correctamente',
+                                ToastService.success(
+                                  title: 'Éxito',
+                                  message: 'Mesa agregada correctamente',
                                 );
                                 Navigator.of(context).pop();
                               },

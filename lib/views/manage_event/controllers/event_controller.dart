@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 import 'package:qr_check_in/models/event_model.dart';
 import 'package:qr_check_in/services/event_service.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 
 class ManageEventController extends GetxController {
   //Host data controllers
@@ -105,10 +106,16 @@ class ManageEventController extends GetxController {
     );
 
     if (result.success) {
-      Get.snackbar('Success', 'Mesas agregadas correctamente');
+      ToastService.success(
+        title: 'Success',
+        message: 'Mesas agregadas correctamente',
+      );
       return true;
     } else {
-      Get.snackbar('Error', result.message ?? 'Error al agregar mesas');
+      ToastService.error(
+        title: 'Error',
+        message: result.message ?? 'Error al agregar mesas',
+      );
     }
     return false;
   }
@@ -118,7 +125,10 @@ class ManageEventController extends GetxController {
     final bool hasNewTables = _hasNewTables();
 
     if (!hasFormChanges && !hasNewTables) {
-      Get.snackbar('Info', 'No hay cambios para guardar');
+      ToastService.warning(
+        title: 'Info',
+        message: 'No hay cambios para guardar',
+      );
       return false;
     }
 
@@ -152,10 +162,16 @@ class ManageEventController extends GetxController {
 
       final result = await _eventService.updateEvent(data: updatedEvent);
       if (result.success) {
-        Get.snackbar('Success', 'Evento actualizado correctamente');
+        ToastService.success(
+          title: 'Success',
+          message: 'Evento actualizado correctamente',
+        );
         return true;
       } else {
-        Get.snackbar('Error', result.message ?? 'Error al actualizar evento');
+        ToastService.error(
+          title: 'Error',
+          message: result.message ?? 'Error al actualizar evento',
+        );
       }
     } else {
       return addEventTables();
@@ -194,10 +210,16 @@ class ManageEventController extends GetxController {
 
       final result = await _eventService.createEvent(data: newEvent);
       if (result.success) {
-        Get.snackbar('Success', 'Event created successfully');
+        ToastService.success(
+          title: 'Success',
+          message: 'Event created successfully',
+        );
         return true;
       } else {
-        Get.snackbar('Error', result.message ?? 'Unknown error');
+        ToastService.error(
+          title: 'Error',
+          message: result.message ?? 'Unknown error',
+        );
       }
     }
     return false;
