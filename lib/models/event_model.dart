@@ -1,5 +1,5 @@
-import 'package:qr_check_in/models/has_id_label.dart';
 import 'guest_model.dart';
+import 'package:qr_check_in/models/has_id_label.dart';
 
 class EventModel {
   final int id;
@@ -15,6 +15,7 @@ class EventModel {
   final Host host;
   final List<EventTable> eventTables;
   final List<Reservation> reservations;
+  final Statistics? statistics;
 
   EventModel({
     required this.id,
@@ -30,6 +31,7 @@ class EventModel {
     required this.host,
     required this.eventTables,
     required this.reservations,
+    this.statistics,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -51,7 +53,7 @@ class EventModel {
       totalSpaces: json['total_spaces'] ?? 0,
       guestEntered: json['companionsEntered'] ?? 0,
       eventDate: DateTime.parse(json['event_date']),
-      status: json['status'],
+      status: json['status'] ?? 0,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])
@@ -59,6 +61,7 @@ class EventModel {
       host: Host.fromJson(json['host']),
       eventTables: tables,
       reservations: reservations,
+      statistics: Statistics.fromJson(json['statistics']),
     );
   }
 
@@ -72,6 +75,7 @@ class EventModel {
         "eventDate": eventDate.toIso8601String(),
       },
       "tablesData": eventTables.map((table) => table.toJson()).toList(),
+      "statistics": statistics,
     };
   }
 
@@ -185,13 +189,13 @@ class EventTable implements HasIdLabel {
 
   factory EventTable.fromJson(Map<String, dynamic> json) {
     return EventTable(
-      id: json['id'],
-      eventId: json['event_id'],
-      name: json['name'],
-      description: json['description'],
-      tableNumber: json['table_number'],
-      capacity: json['capacity'],
-      status: json['status'],
+      id: json['id'] ?? 0,
+      eventId: json['event_id'] ?? 0,
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      tableNumber: json['table_number'] ?? 0,
+      capacity: json['capacity'] ?? 0,
+      status: json['status'] ?? 0,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])
@@ -228,46 +232,51 @@ class EventTable implements HasIdLabel {
 
 class Reservation {
   final int id;
-  final String uuidCode;
   final int eventId;
-  final int tableId;
   final int guestId;
+  final int familyId;
   final int numCompanions;
   final int status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final Guest guest;
-  final EventTable table;
+  final Family family;
+  final List<ReservationMember> reservationMembers;
 
   Reservation({
     required this.id,
-    required this.uuidCode,
     required this.eventId,
-    required this.tableId,
     required this.guestId,
+    required this.familyId,
     required this.numCompanions,
     required this.status,
     required this.createdAt,
-    required this.updatedAt,
+    this.updatedAt,
     required this.guest,
-    required this.table,
+    required this.family,
+    required this.reservationMembers,
   });
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
+    List<ReservationMember> members = json['reservation_members'] != null
+        ? (json['reservation_members'] as List)
+            .map((e) => ReservationMember.fromJson(e))
+            .toList()
+        : [];
     return Reservation(
-      id: json['id'],
-      uuidCode: json['uuid_code'],
-      eventId: json['event_id'],
-      tableId: json['table_id'],
-      guestId: json['guest_id'],
-      numCompanions: json['num_companions'],
-      status: json['status'],
+      id: json['id'] ?? 0,
+      eventId: json['event_id'] ?? 0,
+      guestId: json['guest_id'] ?? 0,
+      familyId: json['family_id'] ?? 0,
+      numCompanions: json['num_companions'] ?? 0,
+      status: json['status'] ?? 0,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])
           : null,
-      guest: Guest.fromJson(json['guest']), // Ensure Guest is imported
-      table: EventTable.fromJson(json['table']),
+      guest: Guest.fromJson(json['guest']),
+      family: Family.fromJson(json['family']),
+      reservationMembers: members,
     );
   }
 }
@@ -341,4 +350,220 @@ class ReservationDetails {
       nit.hashCode ^
       tableId.hashCode ^
       totalOccupants.hashCode;
+}
+
+class Family {
+  final int id;
+  final String name;
+  final int status;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final List<FamilyTable> familyTables;
+
+  Family({
+    required this.id,
+    required this.name,
+    required this.status,
+    required this.createdAt,
+    this.updatedAt,
+    required this.familyTables,
+  });
+
+  factory Family.fromJson(Map<String, dynamic> json) {
+    List<FamilyTable> tables = json['family_tables'] != null
+        ? (json['family_tables'] as List)
+            .map((e) => FamilyTable.fromJson(e))
+            .toList()
+        : [];
+    return Family(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      status: json['status'] ?? 0,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'])
+          : null,
+      familyTables: tables,
+    );
+  }
+}
+
+class FamilyTable {
+  final int id;
+  final int familyId;
+  final int tableId;
+  final int status;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final EventTable eventTable;
+
+  FamilyTable({
+    required this.id,
+    required this.familyId,
+    required this.tableId,
+    required this.status,
+    required this.createdAt,
+    this.updatedAt,
+    required this.eventTable,
+  });
+
+  factory FamilyTable.fromJson(Map<String, dynamic> json) {
+    return FamilyTable(
+      id: json['id'] ?? 0,
+      familyId: json['family_id'] ?? 0,
+      tableId: json['table_id'] ?? 0,
+      status: json['status'] ?? 0,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'])
+          : null,
+      eventTable: EventTable.fromJson(json['event_table']),
+    );
+  }
+}
+
+class ReservationMember {
+  final int id;
+  final int reservationId;
+  final int personId;
+  final String uuidCode;
+  final int status;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final Guest member;
+
+  ReservationMember({
+    required this.id,
+    required this.reservationId,
+    required this.personId,
+    required this.uuidCode,
+    required this.status,
+    required this.createdAt,
+    this.updatedAt,
+    required this.member,
+  });
+
+  factory ReservationMember.fromJson(Map<String, dynamic> json) {
+    return ReservationMember(
+      id: json['id'] ?? 0,
+      reservationId: json['reservation_id'] ?? 0,
+      personId: json['person_id'] ?? 0,
+      uuidCode: json['uuid_code'] ?? '',
+      status: json['status'] ?? 0,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'])
+          : null,
+      member: Guest.fromJson(json['member']),
+    );
+  }
+}
+
+class Statistics {
+  final Summary summary;
+  final Details details;
+
+  Statistics({required this.summary, required this.details});
+
+  factory Statistics.fromJson(Map<String, dynamic> json) {
+    return Statistics(
+      summary: Summary.fromJson(json['summary']),
+      details: Details.fromJson(json['details']),
+    );
+  }
+}
+
+class Summary {
+  final int totalGuests;
+  final int totalCheckedIn;
+  final int totalFamilies;
+  final int totalTables;
+  final int totalCapacity;
+  final int availableSpaces;
+  final String occupancyRate;
+
+  Summary({
+    required this.totalGuests,
+    required this.totalCheckedIn,
+    required this.totalFamilies,
+    required this.totalTables,
+    required this.totalCapacity,
+    required this.availableSpaces,
+    required this.occupancyRate,
+  });
+
+  factory Summary.fromJson(Map<String, dynamic> json) {
+    return Summary(
+      totalGuests: json['totalGuests'] ?? 0,
+      totalCheckedIn: json['totalCheckedIn'] ?? 0,
+      totalFamilies: json['totalFamilies'] ?? 0,
+      totalTables: json['totalTables'] ?? 0,
+      totalCapacity: json['totalCapacity'] ?? 0,
+      availableSpaces: json['availableSpaces'] ?? 0,
+      occupancyRate: json['occupancyRate'] ?? '',
+    );
+  }
+}
+
+class Details {
+  final List<FamilyDetails> families;
+  final List<TableDetails> tables;
+
+  Details({required this.families, required this.tables});
+
+  factory Details.fromJson(Map<String, dynamic> json) {
+    List<FamilyDetails> families = json['families'] != null
+        ? (json['families'] as List)
+            .map((e) => FamilyDetails.fromJson(e))
+            .toList()
+        : [];
+    List<TableDetails> tables = json['tables'] != null
+        ? (json['tables'] as List)
+            .map((e) => TableDetails.fromJson(e))
+            .toList()
+        : [];
+    return Details(families: families, tables: tables);
+  }
+}
+
+class FamilyDetails {
+  final int id;
+  final String name;
+  final int membersCount;
+  final int checkedInCount;
+  final List<int> assignedTables;
+
+  FamilyDetails({
+    required this.id,
+    required this.name,
+    required this.membersCount,
+    required this.checkedInCount,
+    required this.assignedTables,
+  });
+
+  factory FamilyDetails.fromJson(Map<String, dynamic> json) {
+    return FamilyDetails(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      membersCount: json['membersCount'] ?? 0,
+      checkedInCount: json['checkedInCount'] ?? 0,
+      assignedTables: List<int>.from(json['assignedTables'] ?? []),
+    );
+  }
+}
+
+class TableDetails {
+  final int id;
+  final int capacity;
+  final int assigned;
+
+  TableDetails({required this.id, required this.capacity, required this.assigned});
+
+  factory TableDetails.fromJson(Map<String, dynamic> json) {
+    return TableDetails(
+      id: json['id'] ?? 0,
+      capacity: json['capacity'] ?? 0,
+      assigned: json['assigned'] ?? 0,
+    );
+  }
 }

@@ -77,11 +77,11 @@ class QRPrintServiceReservation {
             <button onclick="window.close()">Cerrar</button>
           </div>
           <div class="container">
-            ${reservations.map((reservation) => '''
+            ${reservations.expand((e) => e.reservationMembers).map((reservation) => '''
               <div class="qr-card">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(reservation.uuidCode)}"/>
-                <div class="guest-name">${_escapeHtml(reservation.guest.fullName)}</div>
-                <div class="spaces">Espacios reservados: ${reservation.numCompanions}</div>
+                <div class="guest-name">${_escapeHtml(reservation.member.fullName)}</div>
+                <div class="spaces">Mesa  numero: #-- </div>
               </div>
             ''').join('')}
           </div>
@@ -89,6 +89,8 @@ class QRPrintServiceReservation {
       </html>
     ''';
 
+
+    //TODO add table number line 84
     final blob = html.Blob([htmlContent], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
 

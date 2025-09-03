@@ -31,7 +31,7 @@ class RemovePassesController extends GetxController {
         isLoading.value = true;
         final int selectedTableId = table.id;
         List<int> deletedIds = selectedData!.reservations
-            .where((reservation) => reservation.tableId == selectedTableId)
+            .where((reservation) => reservation.family.familyTables.map((e) => e.id).contains(selectedTableId))
             .map((reservation) => reservation.id)
             .toList();
         final response = await _eventService.deleteReservations(deletedIds);

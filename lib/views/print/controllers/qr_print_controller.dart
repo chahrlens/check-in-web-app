@@ -27,7 +27,7 @@ class QrPrintController extends GetxController {
       final table = selectedTable.value;
       if (table == null || selectedData == null) return;
       final reservations = selectedData!.reservations
-          .where((r) => r.tableId == table.id)
+          .where((r) => r.family.familyTables.map((e) => e.id).contains(table.id))
           .toList();
       QRPrintServiceReservation.openPrintWindowForTable(table, reservations);
     } catch (e) {

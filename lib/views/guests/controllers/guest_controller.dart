@@ -55,7 +55,7 @@ class ManageGuestController extends GetxController {
     if (table != null) {
       // Calcular espacios usados
       int usedSpacesOld = oldReservations
-          .where((r) => r.tableId == table.id)
+          .where((r) => r.family.familyTables.map((e) => e.id).contains(table.id))
           .fold(0, (sum, r) => sum + r.numCompanions);
       int usedSpacesNew = reservations
           .where((r) => r.tableId == table.id)
@@ -200,7 +200,7 @@ class ManageGuestController extends GetxController {
 
     // Calcular espacios usados de reservaciones anteriores
     int usedSpacesOld = oldReservations
-        .where((r) => r.tableId == table?.id)
+        .where((r) => r.family.familyTables.map((e) => e.id).contains(table?.id))
         .fold(0, (sum, r) => sum + r.numCompanions);
 
     // Calcular espacios usados de reservaciones nuevas

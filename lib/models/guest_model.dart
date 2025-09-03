@@ -6,7 +6,8 @@ class Guest {
   final String dpi;
   final String nit;
   final String phone;
-  final DateTime createdAt;
+  final String email;
+  final DateTime? createdAt;
   final DateTime? updatedAt;
 
   Guest({
@@ -17,6 +18,7 @@ class Guest {
     required this.dpi,
     required this.nit,
     required this.phone,
+    required this.email,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -30,7 +32,10 @@ class Guest {
       dpi: json['dpi'] ?? '',
       nit: json['nit'] ?? '',
       phone: json['phone'] ?? '',
-      createdAt: DateTime.parse(json['created_at']),
+      email: json['email'] ?? '',
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])
           : null,

@@ -77,17 +77,19 @@ class QRPrintService {
             <button onclick="window.close()">Cerrar</button>
           </div>
           <div class="container">
-            ${event.reservations.map((reservation) => '''
+            ${event.reservations.expand((re) => re.reservationMembers).map((reservation) => '''
               <div class="qr-card">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(reservation.uuidCode)}"/>
-                <div class="guest-name">${_escapeHtml(reservation.guest.fullName)}</div>
-                <div class="spaces">Espacios reservados: ${reservation.numCompanions}</div>
+                <div class="guest-name">${_escapeHtml(reservation.member.fullName)}</div>
+                <div class="spaces">Mesa numero: #-- </div>
               </div>
             ''').join('')}
           </div>
         </body>
       </html>
     ''';
+
+    //TODO add table number line 84
 
     // Crear un Blob con el contenido HTML
     final blob = html.Blob([htmlContent], 'text/html');

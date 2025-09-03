@@ -106,7 +106,7 @@ class _RemovePassesPageState extends State<RemovePassesPage> {
                           // Filtrar las reservaciones por la mesa seleccionada
                           final reservations =
                               _controller.selectedData?.reservations
-                                  .where((r) => r.tableId == selectedTable.id)
+                                  .where((r) => r.family.familyTables.map((e) => e.id).contains(selectedTable.id))
                                   .toList() ??
                               [];
                           if (reservations.isEmpty) {
