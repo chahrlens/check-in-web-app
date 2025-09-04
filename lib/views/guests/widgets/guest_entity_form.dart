@@ -1,7 +1,5 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_check_in/models/event_model.dart';
-import 'package:qr_check_in/widgets/inputs/dropdown_widget_v2.dart';
 import 'package:qr_check_in/widgets/inputs/custom_input_widget.dart';
 import 'package:qr_check_in/views/guests/controllers/guest_controller.dart';
 
@@ -29,25 +27,11 @@ class GuestEntityForm extends StatelessWidget {
                   alignment: WrapAlignment.spaceBetween,
                   runSpacing: 12,
                   children: [
-                    GenericLoadingAutocompleteDropdown<EventTable>(
-                      isLoading: controller.isLoading,
-                      controller: controller.eventTableCtrl,
-                      items: controller.eventTables,
-                      label: 'Seleccionar Mesa',
-                      hintText: 'Selecciona una mesa',
-                      resetValue: controller.selectedTable,
-                      width: width,
-                      enabled: true,
-                      prefixIcon: Icons.table_chart,
-                      onSelected: (table) {
-                        controller.setSelectedTable(table);
-                      },
-                    ),
                     CustomInputWidget(
                       width: width,
                       controller: controller.tableSpaces,
-                      label: 'Espacios en la Mesa',
-                      hintText: 'Espacios en la mesa',
+                      label: 'Espacios totales en la Mesa',
+                      hintText: 'Espacios totales en la mesa',
                       prefixIcon: Icons.event_seat,
                       enabled: false,
                     ),
@@ -61,12 +45,12 @@ class GuestEntityForm extends StatelessWidget {
                     ),
                     CustomInputWidget(
                       width: width,
-                      controller: controller.tableSpaceReservations,
-                      label: 'Espacios a reservar',
-                      hintText: 'Ingresa los espacios a reservar',
+                      controller: controller.tableAvailableSpace,
+                      label: 'Espacios disponibles',
+                      hintText: 'Espacios disponibles',
                       prefixIcon: Icons.event_available,
-                      enabled: controller.isInputEnabled,
                       validator: controller.validateSpacesToReserve,
+                      enabled: false,
                     ),
                     CustomInputWidget(
                       width: width,

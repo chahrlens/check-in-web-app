@@ -4,6 +4,7 @@ import 'package:qr_check_in/widgets/layout/content_card.dart';
 import 'package:qr_check_in/widgets/layout/responsive_layout.dart';
 import 'package:qr_check_in/views/guests/widgets/host_widget_form.dart';
 import 'package:qr_check_in/views/guests/widgets/guest_entity_form.dart';
+import 'package:qr_check_in/views/guests/widgets/family_selector_widget.dart';
 import 'package:qr_check_in/views/guests/controllers/guest_controller.dart';
 
 class ManageGuestsPage extends StatefulWidget {
@@ -43,10 +44,11 @@ class _ManageGuestsPageState extends State<ManageGuestsPage> {
                   title: 'Anfitrión',
                   child: HostEntityForm(width: width),
                 ),
+                //family selection/creation
                 const SizedBox(height: 12),
                 ContentCard(
-                  title: 'Invitado',
-                  child: GuestEntityForm(width: width),
+                  title: 'Familia',
+                  child: FamilySelectorWidget(width: width),
                 ),
                 const SizedBox(height: 12),
                 ContentCard(
@@ -113,6 +115,11 @@ class _ManageGuestsPageState extends State<ManageGuestsPage> {
                       }),
                     ),
                   ),
+                ),
+                const SizedBox(height: 12),
+                ContentCard(
+                  title: 'Invitado',
+                  child: GuestEntityForm(width: width),
                 ),
                 const SizedBox(height: 18),
                 Row(

@@ -62,6 +62,8 @@ class ManageEventController extends GetxController {
       tableNumber: tableNumber,
       capacity: capacity,
       createdAt: DateTime.now(),
+      availableCapacity: 0,
+      reservedCount: 0,
       updatedAt: null,
       status: 1,
     );

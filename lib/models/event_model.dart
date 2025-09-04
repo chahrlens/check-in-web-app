@@ -171,6 +171,8 @@ class EventTable implements HasIdLabel {
   final String description;
   final int tableNumber;
   final int capacity;
+  final int availableCapacity;
+  final int reservedCount;
   final int status;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -182,6 +184,8 @@ class EventTable implements HasIdLabel {
     required this.description,
     required this.tableNumber,
     required this.capacity,
+    required this.availableCapacity,
+    required this.reservedCount,
     required this.status,
     required this.createdAt,
     required this.updatedAt,
@@ -194,7 +198,9 @@ class EventTable implements HasIdLabel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       tableNumber: json['table_number'] ?? 0,
-      capacity: json['capacity'] ?? 0,
+      capacity: json['capacity'] ??  0,
+      availableCapacity: json['availableCapacity'] ?? 0,
+      reservedCount: json['reservedCount'] ?? 0,
       status: json['status'] ?? 0,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: json['updated_at'] != null
@@ -352,7 +358,7 @@ class ReservationDetails {
       totalOccupants.hashCode;
 }
 
-class Family {
+class Family implements HasIdLabel {
   final int id;
   final String name;
   final int status;
@@ -386,6 +392,11 @@ class Family {
       familyTables: tables,
     );
   }
+
+  @override
+  String get identifier => id.toString();
+  @override
+  String get identifierLabel => name;
 }
 
 class FamilyTable {
