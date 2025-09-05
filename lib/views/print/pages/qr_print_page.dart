@@ -123,11 +123,11 @@ class _QRPrintPageState extends State<QRPrintPage> {
                               spacing: 8.0,
                               runSpacing: 8.0,
                               alignment: WrapAlignment.spaceAround,
-                              children: reservations.map((reservation) {
+                              children: reservations.expand((e) => e.reservationMembers).map((member) {
                                 return SizedBox(
                                   width: cardWidth,
                                   child: PrintCardWidget(
-                                    reservation: reservation,
+                                    reservation: member,
                                   ),
                                 );
                               }).toList(),

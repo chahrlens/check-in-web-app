@@ -14,6 +14,7 @@ class QrPrintController extends GetxController {
     if (args != null && args['data'] is EventModel) {
       selectedData = args['data'];
       eventTables.assignAll(selectedData?.eventTables ?? []);
+      eventTables.sort((a, b) => a.id.compareTo(b.id));
     }
   }
 
@@ -26,10 +27,12 @@ class QrPrintController extends GetxController {
     try {
       final table = selectedTable.value;
       if (table == null || selectedData == null) return;
-      final reservations = selectedData!.reservations
+      // Obtener todos los ReservationMember de las reservaciones de la mesa
+      final reservationMembers = selectedData!.reservations
           .where((r) => r.family.familyTables.map((e) => e.id).contains(table.id))
+          .expand((r) => r.reservationMembers)
           .toList();
-      QRPrintServiceReservation.openPrintWindowForTable(table, reservations);
+      QRPrintServiceReservation.openPrintWindowForTable(table, reservationMembers);
     } catch (e) {
       // Manejo de errores
     } finally {
@@ -37,15 +40,12 @@ class QrPrintController extends GetxController {
     }
   }
 
-  Future<void> printSingleQrCode(Reservation reservation) async {
+  Future<void> printSingleQrCode(ReservationMember reservation) async {
     isLoading.value = true;
     try {
       final table = selectedTable.value;
       if (table == null || selectedData == null) return;
-      QRPrintServiceReservation.openPrintWindowForTable(
-        table,
-        [reservation],
-      );
+      QRPrintServiceReservation.openPrintWindowForTable(table, [reservation]);
     } catch (e) {
       // Manejo de errores
     } finally {

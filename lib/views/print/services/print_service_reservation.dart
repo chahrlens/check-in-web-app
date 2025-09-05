@@ -8,7 +8,7 @@ class QRPrintServiceReservation {
     return htmlEscape.convert(text);
   }
 
-  static void openPrintWindowForTable(EventTable table, List<Reservation> reservations) {
+  static void openPrintWindowForTable(EventTable table, List<ReservationMember> reservations) {
     final htmlContent = '''
       <!DOCTYPE html>
       <html>
@@ -77,11 +77,11 @@ class QRPrintServiceReservation {
             <button onclick="window.close()">Cerrar</button>
           </div>
           <div class="container">
-            ${reservations.expand((e) => e.reservationMembers).map((reservation) => '''
+            ${reservations.map((reservation) => '''
               <div class="qr-card">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(reservation.uuidCode)}"/>
                 <div class="guest-name">${_escapeHtml(reservation.member.fullName)}</div>
-                <div class="spaces">Mesa  numero: #-- </div>
+                <div class="spaces">Mesa número: #${_escapeHtml(table.tableNumber.toString())}</div>
               </div>
             ''').join('')}
           </div>
