@@ -4,6 +4,7 @@ import 'package:qr_check_in/widgets/layout/content_card.dart';
 import 'package:qr_check_in/widgets/layout/responsive_layout.dart';
 import 'package:qr_check_in/views/guests/widgets/host_widget_form.dart';
 import 'package:qr_check_in/views/guests/widgets/guest_entity_form.dart';
+import 'package:qr_check_in/views/guests/widgets/family_selector_widget.dart';
 import 'package:qr_check_in/views/guests/controllers/guest_controller.dart';
 
 class ManageGuestsPage extends StatefulWidget {
@@ -43,19 +44,27 @@ class _ManageGuestsPageState extends State<ManageGuestsPage> {
                   title: 'Anfitrión',
                   child: HostEntityForm(width: width),
                 ),
+                //family selection/creation
                 const SizedBox(height: 12),
                 ContentCard(
-                  title: 'Invitado',
+                  title: 'Familia',
+                  child: FamilySelectorWidget(width: width),
+                ),
+
+                const SizedBox(height: 12),
+                ContentCard(
+                  title: 'Agregar Invitado',
                   child: GuestEntityForm(width: width),
                 ),
                 const SizedBox(height: 12),
                 ContentCard(
+                  title: 'Invitados',
                   child: Obx(
                     () => Wrap(
-                      children: List.generate(_controller.reservations.length, (
+                      children: List.generate(_controller.guests.length, (
                         index,
                       ) {
-                        final reservation = _controller.reservations[index];
+                        final guest = _controller.guests[index];
                         return Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Container(
@@ -86,14 +95,10 @@ class _ManageGuestsPageState extends State<ManageGuestsPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${reservation.guestName} ${reservation.guestLastName}',
+                                      '${guest.firstName} ${guest.lastName}',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
-                                    ),
-                                    Text('Mesa: ${reservation.table}'),
-                                    Text(
-                                      'Espacios: ${reservation.totalOccupants}',
                                     ),
                                   ],
                                 ),
@@ -102,9 +107,8 @@ class _ManageGuestsPageState extends State<ManageGuestsPage> {
                                     Icons.delete,
                                     color: Colors.redAccent,
                                   ),
-                                  onPressed: () {
-                                    _controller.reservations.removeAt(index);
-                                  },
+                                  onPressed: () =>
+                                      _controller.removeGuestAt(index),
                                 ),
                               ],
                             ),

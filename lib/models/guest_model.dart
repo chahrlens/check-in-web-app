@@ -6,7 +6,8 @@ class Guest {
   final String dpi;
   final String nit;
   final String phone;
-  final DateTime createdAt;
+  final String email;
+  final DateTime? createdAt;
   final DateTime? updatedAt;
 
   Guest({
@@ -17,6 +18,7 @@ class Guest {
     required this.dpi,
     required this.nit,
     required this.phone,
+    required this.email,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -30,12 +32,55 @@ class Guest {
       dpi: json['dpi'] ?? '',
       nit: json['nit'] ?? '',
       phone: json['phone'] ?? '',
-      createdAt: DateTime.parse(json['created_at']),
+      email: json['email'] ?? '',
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])
           : null,
     );
   }
+
+  factory Guest.instance({
+    String firstName = "anonymous",
+    String lastName = "",
+    String role = "guest",
+    String dpi = "",
+    String nit = "",
+    String phone = "",
+    String email = "",
+  }) {
+    return Guest(
+      id: 0,
+      firstName: firstName,
+      lastName: lastName,
+      role: role,
+      dpi: dpi,
+      nit: nit,
+      phone: phone,
+      email: email,
+      createdAt: null,
+      updatedAt: null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    if (firstName == "anonymous") {
+      return {"isAnonymous": true};
+    }
+    return {
+      "id": id == 0 ? null : id,
+      "firstName": firstName,
+      "lastName": lastName,
+      "role": role,
+      "dpi": dpi,
+      "nit": nit,
+      "phone": phone,
+      "email": email,
+    };
+  }
+
   String get fullName => '$firstName $lastName';
 
   @override

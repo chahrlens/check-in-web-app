@@ -6,7 +6,7 @@ import 'package:qr_check_in/views/print/controllers/qr_print_controller.dart';
 class PrintCardWidget extends StatelessWidget {
   PrintCardWidget({super.key, required this.reservation});
 
-  final Reservation reservation;
+  final ReservationMember reservation;
   final QrPrintController controller = Get.find<QrPrintController>();
 
   @override
@@ -22,7 +22,7 @@ class PrintCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Invitado: ${reservation.guest.fullName}',
+              'Invitado: ${reservation.member.fullName}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -31,19 +31,15 @@ class PrintCardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Teléfono: ${reservation.guest.phone}',
+              'Teléfono: ${reservation.member.phone}',
               style: TextStyle(color: Colors.black87),
             ),
             Text(
-              'DPI: ${reservation.guest.dpi}',
+              'DPI: ${reservation.member.dpi}',
               style: TextStyle(color: Colors.black87),
             ),
             Text(
-              'NIT: ${reservation.guest.nit}',
-              style: TextStyle(color: Colors.black87),
-            ),
-            Text(
-              'Acompañantes: ${reservation.numCompanions}',
+              'NIT: ${reservation.member.nit}',
               style: TextStyle(color: Colors.black87),
             ),
             const SizedBox(height: 12),

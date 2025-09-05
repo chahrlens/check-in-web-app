@@ -89,7 +89,7 @@ class CheckInController extends GetxController {
       // Datos de la mesa
       tableNumber.text =
           'Mesa ${checkInData!.table.tableNumber} - ${checkInData!.table.name}';
-      reservedSpaces.text = checkInData?.companions.total.toString() ?? '0';
+      reservedSpaces.text = checkInData!.totalSpacesRemaining.toString();
 
       // Mostrar espacios totales disponibles (no solo acompañantes)
       quantityAvailable.text = checkInData!.totalSpacesRemaining.toString();
