@@ -6,6 +6,7 @@ import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/theme/color_pallete.dart';
 import 'package:qr_check_in/services/auth_service.dart';
 import 'package:qr_check_in/config/firebase_options.dart';
+import 'package:qr_check_in/observers/route_observer.dart';
 import 'package:qr_check_in/controllers/loader_controller.dart';
 import 'package:qr_check_in/shared/resources/local_storaje.dart';
 import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         defaultTransition: Transition.fadeIn,
         getPages: PRIMARY_ROUTING_PATHS,
         theme: appTheme,
+        navigatorObservers: [routeObserver],
         routingCallback: (routing) {
           if (routing?.current != null) {
             debugPrint('ROUTE CALLED: ${routing?.current}');
