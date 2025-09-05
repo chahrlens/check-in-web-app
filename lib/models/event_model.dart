@@ -198,7 +198,7 @@ class EventTable implements HasIdLabel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       tableNumber: json['table_number'] ?? 0,
-      capacity: json['capacity'] ??  0,
+      capacity: json['capacity'] ?? 0,
       availableCapacity: json['availableCapacity'] ?? 0,
       reservedCount: json['reservedCount'] ?? 0,
       status: json['status'] ?? 0,
@@ -266,8 +266,8 @@ class Reservation {
   factory Reservation.fromJson(Map<String, dynamic> json) {
     List<ReservationMember> members = json['reservation_members'] != null
         ? (json['reservation_members'] as List)
-            .map((e) => ReservationMember.fromJson(e))
-            .toList()
+              .map((e) => ReservationMember.fromJson(e))
+              .toList()
         : [];
     return Reservation(
       id: json['id'] ?? 0,
@@ -289,73 +289,42 @@ class Reservation {
 
 class EventReservation {
   final int eventId;
-  final List<ReservationDetails> details;
+  final Family family;
+  List<Guest> details;
 
-  EventReservation({required this.eventId, required this.details});
-
-  Map<String, dynamic> toJson() {
-    return {
-      "eventId": eventId,
-      "reservations": details.map((e) => e.toJson()).toList(),
-    };
-  }
-}
-
-class ReservationDetails {
-  final String guestName;
-  final String guestLastName;
-  final String phone;
-  final String dpi;
-  final String nit;
-  final int tableId;
-  final String table;
-  final int totalOccupants;
-
-  ReservationDetails({
-    required this.guestName,
-    required this.guestLastName,
-    required this.phone,
-    required this.dpi,
-    required this.nit,
-    required this.tableId,
-    required this.table,
-    required this.totalOccupants,
+  EventReservation({
+    required this.eventId,
+    required this.family,
+    this.details = const [],
   });
 
   Map<String, dynamic> toJson() {
     return {
-      "guestName": guestName,
-      "guestLastName": guestLastName,
-      "phone": phone,
-      "dpi": dpi,
-      "nit": nit,
-      "tableId": tableId,
-      "totalOccupants": totalOccupants,
+      "eventId": eventId,
+      ...family.toJson(),
+      "guests": details.map((e) => e.toJson()).toList(),
     };
   }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ReservationDetails &&
-          runtimeType == other.runtimeType &&
-          guestName == other.guestName &&
-          guestLastName == other.guestLastName &&
-          phone == other.phone &&
-          dpi == other.dpi &&
-          nit == other.nit &&
-          tableId == other.tableId &&
-          totalOccupants == other.totalOccupants;
+  factory EventReservation.instance({
+    required int eventId,
+    required Family family,
+    List<Guest> details = const [],
+  }) {
+    return EventReservation(eventId: eventId, family: family, details: details);
+  }
 
-  @override
-  int get hashCode =>
-      guestName.hashCode ^
-      guestLastName.hashCode ^
-      phone.hashCode ^
-      dpi.hashCode ^
-      nit.hashCode ^
-      tableId.hashCode ^
-      totalOccupants.hashCode;
+  EventReservation copyWith({
+    int? eventId,
+    Family? family,
+    List<Guest>? details,
+  }) {
+    return EventReservation(
+      eventId: eventId ?? this.eventId,
+      family: family ?? this.family,
+      details: details ?? this.details,
+    );
+  }
 }
 
 class Family implements HasIdLabel {
@@ -378,8 +347,8 @@ class Family implements HasIdLabel {
   factory Family.fromJson(Map<String, dynamic> json) {
     List<FamilyTable> tables = json['family_tables'] != null
         ? (json['family_tables'] as List)
-            .map((e) => FamilyTable.fromJson(e))
-            .toList()
+              .map((e) => FamilyTable.fromJson(e))
+              .toList()
         : [];
     return Family(
       id: json['id'] ?? 0,
@@ -391,6 +360,26 @@ class Family implements HasIdLabel {
           : null,
       familyTables: tables,
     );
+  }
+
+  factory Family.instance({
+    String name = "Sin Nombre",
+    List<FamilyTable> familyTables = const [],
+  }) {
+    return Family(
+      id: 0,
+      name: name,
+      status: 1,
+      createdAt: DateTime.now(),
+      familyTables: familyTables,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "family": {"id": id == 0 ? null : id, "familyName": name},
+      "tableIds": familyTables.map((e) => e.tableId).toList(),
+    };
   }
 
   @override
@@ -406,7 +395,7 @@ class FamilyTable {
   final int status;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  final EventTable eventTable;
+  final EventTable? eventTable;
 
   FamilyTable({
     required this.id,
@@ -415,7 +404,7 @@ class FamilyTable {
     required this.status,
     required this.createdAt,
     this.updatedAt,
-    required this.eventTable,
+    this.eventTable,
   });
 
   factory FamilyTable.fromJson(Map<String, dynamic> json) {
@@ -429,6 +418,18 @@ class FamilyTable {
           ? DateTime.tryParse(json['updated_at'])
           : null,
       eventTable: EventTable.fromJson(json['event_table']),
+    );
+  }
+
+  factory FamilyTable.fromEventTable(EventTable table) {
+    return FamilyTable(
+      id: 0,
+      familyId: 0,
+      tableId: table.id,
+      status: 1,
+      createdAt: DateTime.now(),
+      updatedAt: null,
+      eventTable: table,
     );
   }
 }
@@ -525,13 +526,11 @@ class Details {
   factory Details.fromJson(Map<String, dynamic> json) {
     List<FamilyDetails> families = json['families'] != null
         ? (json['families'] as List)
-            .map((e) => FamilyDetails.fromJson(e))
-            .toList()
+              .map((e) => FamilyDetails.fromJson(e))
+              .toList()
         : [];
     List<TableDetails> tables = json['tables'] != null
-        ? (json['tables'] as List)
-            .map((e) => TableDetails.fromJson(e))
-            .toList()
+        ? (json['tables'] as List).map((e) => TableDetails.fromJson(e)).toList()
         : [];
     return Details(families: families, tables: tables);
   }
@@ -568,7 +567,11 @@ class TableDetails {
   final int capacity;
   final int assigned;
 
-  TableDetails({required this.id, required this.capacity, required this.assigned});
+  TableDetails({
+    required this.id,
+    required this.capacity,
+    required this.assigned,
+  });
 
   factory TableDetails.fromJson(Map<String, dynamic> json) {
     return TableDetails(

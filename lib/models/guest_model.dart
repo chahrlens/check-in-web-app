@@ -41,6 +41,46 @@ class Guest {
           : null,
     );
   }
+
+  factory Guest.instance({
+    String firstName = "anonymous",
+    String lastName = "",
+    String role = "guest",
+    String dpi = "",
+    String nit = "",
+    String phone = "",
+    String email = "",
+  }) {
+    return Guest(
+      id: 0,
+      firstName: firstName,
+      lastName: lastName,
+      role: role,
+      dpi: dpi,
+      nit: nit,
+      phone: phone,
+      email: email,
+      createdAt: null,
+      updatedAt: null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    if (firstName == "anonymous") {
+      return {"isAnonymous": true};
+    }
+    return {
+      "id": id == 0 ? null : id,
+      "firstName": firstName,
+      "lastName": lastName,
+      "role": role,
+      "dpi": dpi,
+      "nit": nit,
+      "phone": phone,
+      "email": email,
+    };
+  }
+
   String get fullName => '$firstName $lastName';
 
   @override

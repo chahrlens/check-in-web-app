@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:qr_check_in/controllers/loader_controller.dart';
 import 'package:qr_check_in/models/event_model.dart';
+import 'package:qr_check_in/models/guest_model.dart';
 import 'package:qr_check_in/services/event_service.dart';
 import 'package:qr_check_in/services/toast_service.dart';
+import 'package:qr_check_in/controllers/loader_controller.dart';
 
 class ManageGuestController extends GetxController {
   final EventService _eventService = EventService();
@@ -38,12 +39,14 @@ class ManageGuestController extends GetxController {
   RxList<EventTable> eventTables = <EventTable>[].obs;
   RxList<EventTable> selectedTables = <EventTable>[].obs;
   RxList<EventTable> currentAssociatedTables = <EventTable>[].obs;
+  RxList<Guest> guests = <Guest>[].obs;
 
   Rx<EventTable?> selectedTable = Rx<EventTable?>(null);
   List<Reservation> oldReservations = [];
-  RxList<ReservationDetails> reservations = <ReservationDetails>[].obs;
 
   EventModel? selectedEvent;
+  Reservation? selectedReservation; // For editing existing reservation
+  EventReservation? newEventReservation; // For new reservation
   Rx<Family?> selectedFamily = Rx<Family?>(null);
 
   String? validateSpacesToReserve(String? value) {
@@ -66,9 +69,7 @@ class ManageGuestController extends GetxController {
             (r) => r.family.familyTables.map((e) => e.id).contains(table.id),
           )
           .fold(0, (sum, r) => sum + r.numCompanions);
-      int usedSpacesNew = reservations
-          .where((r) => r.tableId == table.id)
-          .fold(0, (sum, r) => sum + r.totalOccupants);
+      int usedSpacesNew = guests.length;
       int availableSpaces = table.capacity - (usedSpacesOld + usedSpacesNew);
 
       if (spaces > availableSpaces) {
@@ -146,37 +147,102 @@ class ManageGuestController extends GetxController {
     return null;
   }
 
-  Future<bool> handleSave() async {
+  Future<bool> saveReservation() async {
     try {
-      if (selectedEvent == null || reservations.isEmpty) {
-        ToastService.error(
-          title: "Error",
-          message: "No event selected or no reservations made",
-        );
+      if (newEventReservation == null) {
+        ToastService.error(title: "Error", message: "No reservation data");
         return false;
       }
-      final EventReservation reservation = EventReservation(
-        eventId: selectedEvent!.id,
-        details: reservations,
-      );
-      final response = await _eventService.addReservations(reservation);
-      if (response.success) {
+      final result = await _eventService.addReservations(newEventReservation!);
+      if (result.success) {
         ToastService.success(
           title: "Success",
-          message: "Reservations added successfully",
+          message: "Reservation saved successfully",
         );
         return true;
-      } else {
-        ToastService.error(
-          title: "Error",
-          message: response.message ?? "Unknown error",
-        );
       }
+
+      ToastService.error(
+        title: "Error",
+        message: result.message ?? "Unknown error",
+      );
       return false;
     } catch (e) {
       ToastService.error(title: "Error", message: e.toString());
       return false;
     }
+  }
+
+  Future<bool> updateGuestDetails() async {
+    try {
+      if (selectedReservation == null) {
+        ToastService.error(title: "Error", message: "No reservation selected");
+        return false;
+      }
+      final List<int> oldAssociatedTableIds = selectedReservation!
+          .family
+          .familyTables
+          .map((e) => e.tableId)
+          .toList();
+      List<int> associatedTableIds = getAssociatedTableIds();
+      // Remover IDs que ya estaban asociadas para no duplicar
+      associatedTableIds.removeWhere(
+        (id) => oldAssociatedTableIds.contains(id),
+      );
+      final result = await _eventService.appendGuestsToBooking(
+        reservationId: selectedReservation!.id,
+        guests: guests.toList(),
+        additionalTables: associatedTableIds.isEmpty
+            ? null
+            : associatedTableIds,
+      );
+      if (result.success) {
+        ToastService.success(
+          title: "Success",
+          message: "Guest details updated successfully",
+        );
+        return true;
+      }
+      ToastService.error(
+        title: "Error",
+        message: result.message ?? "Unknown error",
+      );
+      return false;
+    } catch (e) {
+      ToastService.error(title: "Error", message: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> handleSave() async {
+    try {
+      if (guests.isEmpty || selectedEvent == null) {
+        ToastService.error(
+          title: "Error",
+          message: "No guests added or no event selected",
+        );
+        return false;
+      }
+      if (newEventReservation != null) {
+        return saveReservation();
+      } else if (selectedReservation != null) {
+        return updateGuestDetails();
+      } else {
+        ToastService.error(title: "Error", message: "No reservation data");
+        return false;
+      }
+    } catch (e) {
+      ToastService.error(title: "Error", message: e.toString());
+      return false;
+    }
+  }
+
+  bool isAnonymous() {
+    return guestName.text.isEmpty &&
+        guestLastName.text.isEmpty &&
+        phone.text.isEmpty &&
+        dpi.text.isEmpty &&
+        nit.text.isEmpty;
   }
 
   void setEventData(dynamic args) {
@@ -199,7 +265,7 @@ class ManageGuestController extends GetxController {
     }
   }
 
-  void setSelectedTable() {
+  void updateTableStatics() {
     final int availableAssociatedSpaces = currentAssociatedTables.fold(
       0,
       (sum, table) => sum + table.availableCapacity,
@@ -233,14 +299,17 @@ class ManageGuestController extends GetxController {
     }
 
     // Calcular espacios usados de reservaciones nuevas
-    int usedSpacesNew = reservations.length;
+    int usedSpacesNew = guests.length;
     tableSpaces.text = totalCapacity.toString();
-
     tableUsedSpaces.text = (totalUsedSpaces + usedSpacesNew).toString();
-    tableAvailableSpace.text = totalAvailableSpaces.toString();
+    // Reducir dinámicamente el input de espacios disponibles
+    final remainingSpaces = totalAvailableSpaces - usedSpacesNew;
+    tableAvailableSpace.text = remainingSpaces > 0
+        ? remainingSpaces.toString()
+        : '0';
 
     // Validar si hay espacios disponibles
-    if (usedSpacesNew >= totalAvailableSpaces) {
+    if (remainingSpaces <= 0) {
       isInputEnabled = false;
     } else {
       isInputEnabled = true;
@@ -252,9 +321,11 @@ class ManageGuestController extends GetxController {
     currentAssociatedTables.clear();
     selectedTables.clear();
     if (family != null) {
+      newEventReservation = null;
       selectedFamily.value = family;
       final Reservation? reservation = selectedEvent?.reservations
           .firstWhereOrNull((r) => r.family.id == family.id);
+      selectedReservation = reservation;
 
       final List<int> reservationTableIds =
           reservation?.family.familyTables.map((e) => e.tableId).toList() ?? [];
@@ -263,8 +334,9 @@ class ManageGuestController extends GetxController {
       );
     } else {
       selectedFamily.value = null;
+      selectedReservation = null;
     }
-    setSelectedTable();
+    updateTableStatics();
     update();
   }
 
@@ -287,24 +359,91 @@ class ManageGuestController extends GetxController {
   }
 
   void appendReservation() {
-    if (selectedTable.value == null) {
-      ToastService.error(title: "Error", message: "Please select a table");
+    if (selectedTables.isEmpty || familyNameCtrl.text.isEmpty) {
+      ToastService.error(
+        title: "Error",
+        message: "No family or tables selected",
+      );
       return;
     }
-    final ReservationDetails newReservation = ReservationDetails(
-      guestName: guestName.text,
-      guestLastName: guestLastName.text,
-      phone: phone.text,
-      dpi: dpi.text,
-      nit: nit.text,
-      tableId: selectedTable.value!.id,
-      table: selectedTable.value!.name,
-      totalOccupants: int.tryParse(tableAvailableSpace.text) ?? 0,
-    );
 
-    reservations.add(newReservation);
+    final List<FamilyTable> tables = selectedTables
+        .map<FamilyTable>((table) => FamilyTable.fromEventTable(table))
+        .toList();
+    if (newEventReservation != null) {
+      final newGuest = Guest.instance(
+        firstName: guestName.text.isEmpty ? 'anonymous' : guestName.text,
+        lastName: guestLastName.text,
+        phone: phone.text,
+        dpi: dpi.text,
+        nit: nit.text,
+      );
+      guests.add(newGuest);
+      newEventReservation?.details = guests.toList();
+    } else {
+      final newFamily = Family.instance(
+        name: familyNameCtrl.text,
+        familyTables: tables,
+      );
+
+      final newGuest = Guest.instance(
+        firstName: guestName.text,
+        lastName: guestLastName.text,
+        phone: phone.text,
+        dpi: dpi.text,
+        nit: nit.text,
+      );
+
+      guests.add(newGuest);
+
+      final newReservation = EventReservation.instance(
+        eventId: selectedEvent?.id ?? 0,
+        family: newFamily,
+        details: guests.toList(),
+      );
+      newEventReservation = newReservation;
+    }
 
     cleanGuest();
+    updateTableStatics();
+  }
+
+  void appendData() {
+    if (selectedReservation != null) {
+      final isAnon = isAnonymous();
+      if (isAnon) {
+        guests.add(
+          Guest.instance(
+            firstName: 'anonymous',
+            lastName: guestLastName.text,
+            phone: phone.text,
+            dpi: dpi.text,
+            nit: nit.text,
+          ),
+        );
+      } else {
+        guests.add(
+          Guest.instance(
+            firstName: guestName.text,
+            lastName: guestLastName.text,
+            phone: phone.text,
+            dpi: dpi.text,
+            nit: nit.text,
+          ),
+        );
+      }
+      cleanGuest();
+      updateTableStatics();
+    } else {
+      appendReservation();
+    }
+  }
+
+  void removeGuestAt(int index) {
+    if (index >= 0 && index < guests.length) {
+      guests.removeAt(index);
+      updateTableStatics();
+    }
   }
 
   Future<void> getFamilies() async {

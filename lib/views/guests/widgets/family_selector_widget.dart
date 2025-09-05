@@ -78,7 +78,7 @@ class FamilySelectorWidget extends StatelessWidget {
                                 } else {
                                   controller.selectedTables.remove(table);
                                 }
-                                controller.setSelectedTable();
+                                controller.updateTableStatics();
                               },
                             );
                           }).toList(),
@@ -121,7 +121,7 @@ class FamilySelectorWidget extends StatelessWidget {
                                     } else {
                                       controller.selectedTables.remove(table);
                                     }
-                                    controller.setSelectedTable();
+                                    controller.updateTableStatics();
                                   },
                                 );
                               })

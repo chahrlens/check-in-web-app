@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/widgets/inputs/custom_input_widget.dart';
 import 'package:qr_check_in/views/guests/controllers/guest_controller.dart';
 
@@ -108,10 +109,31 @@ class GuestEntityForm extends StatelessWidget {
               child: Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      controller.appendReservation();
+                    final isAnonymous = controller.isAnonymous();
+                    final bool hasGuests = controller.guests.isNotEmpty;
+                    // Validar si el campo de espacios disponibles llega a cero
+                    final availableSpaces =
+                        int.tryParse(controller.tableAvailableSpace.text) ?? 0;
+                    if (availableSpaces <= 0) {
+                      ToastService.warning(
+                        title: "Advertencia",
+                        message:
+                            "No se pueden agregar más invitados, la lista de espacios está vacía.",
+                      );
+                      return;
+                    }
+                    // Si es anónimo y ya tiene invitados o si hay una reserva seleccionada, no validar el formulario
+                    if (isAnonymous && hasGuests ||
+                        controller.selectedReservation != null) {
+                      if (controller.isInputEnabled) {
+                        controller.appendData();
+                      }
                     } else {
-                      controller.autoValidateMode = true;
+                      if (_formKey.currentState?.validate() ?? false) {
+                        controller.appendData();
+                      } else {
+                        controller.autoValidateMode = true;
+                      }
                     }
                     controller.update();
                   },
