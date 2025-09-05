@@ -21,13 +21,13 @@ class CheckInModel {
     return CheckInModel(
       reservation: CheckReservation.fromJson(json['reservation']),
       guest: CheckGuest.fromJson(json['guest']),
-      companions: Participants.fromJson(json['companions']),
-      totalSpacesRemaining: json['totalSpacesRemaining'],
+      companions: Participants.fromJson(json['companions'] ?? {}),
+      totalSpacesRemaining: json['totalSpacesRemaining'] ?? 0,
       table: TableInfo.fromJson(json['table']),
       event: EventInfo.fromJson(json['event']),
-      checkIns: (json['checkIns'] as List)
+      checkIns: (json['checkIns'] != null) ? (json['checkIns'] as List)
           .map((e) => CheckInEntry.fromJson(e))
-          .toList(),
+          .toList() : [],
     );
   }
 }
@@ -49,8 +49,8 @@ class CheckReservation {
     return CheckReservation(
       id: json['id'],
       uuid: json['uuid'],
-      totalReserved: json['totalReserved'],
-      status: json['status'],
+      totalReserved: json['totalReserved'] ?? 0,
+      status: json['status'] ?? 0,
     );
   }
 }

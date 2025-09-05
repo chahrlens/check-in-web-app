@@ -142,49 +142,49 @@ class _CheckInPageState extends State<CheckInPage>
                           children: _controller.checkInData == null
                               ? []
                               : [
-                                  CustomInputWidget(
-                                    width: firstInputsWidth,
-                                    controller: _controller.quantity,
-                                    label: 'Acompañantes a ingresar',
-                                    hintText:
-                                        'Ingrese cantidad de acompañantes',
-                                    prefixIcon: Icons.confirmation_number,
-                                    keyboardType: TextInputType.number,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Ingrese la cantidad';
-                                      }
-                                      final available = _controller
-                                          .checkInData!
-                                          .companions
-                                          .remaining;
-                                      final quantity = int.tryParse(value);
-                                      if (quantity == null || quantity <= 0) {
-                                        return 'Cantidad inválida';
-                                      }
-                                      if (quantity > available) {
-                                        return 'Cantidad excede las disponibles';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: firstInputsWidth * 1 / 2,
-                                    child: Obx(() {
-                                      return CheckboxListTile(
-                                        title: const Text(
-                                          'Ingresa invitado principal',
-                                        ),
-                                        enabled:
-                                            !_controller.guestIsArrived.value,
-                                        value: _controller.guestEntered.value,
-                                        onChanged: (value) {
-                                          _controller.guestEntered.value =
-                                              value ?? false;
-                                        },
-                                      );
-                                    }),
-                                  ),
+                                  // CustomInputWidget(
+                                  //   width: firstInputsWidth,
+                                  //   controller: _controller.quantity,
+                                  //   label: 'Acompañantes a ingresar',
+                                  //   hintText:
+                                  //       'Ingrese cantidad de acompañantes',
+                                  //   prefixIcon: Icons.confirmation_number,
+                                  //   keyboardType: TextInputType.number,
+                                  //   validator: (value) {
+                                  //     if (value == null || value.isEmpty) {
+                                  //       return 'Ingrese la cantidad';
+                                  //     }
+                                  //     final available = _controller
+                                  //         .checkInData!
+                                  //         .companions
+                                  //         .remaining;
+                                  //     final quantity = int.tryParse(value);
+                                  //     if (quantity == null || quantity <= 0) {
+                                  //       return 'Cantidad inválida';
+                                  //     }
+                                  //     if (quantity > available) {
+                                  //       return 'Cantidad excede las disponibles';
+                                  //     }
+                                  //     return null;
+                                  //   },
+                                  // ),
+                                  // SizedBox(
+                                  //   width: firstInputsWidth * 1 / 2,
+                                  //   child: Obx(() {
+                                  //     return CheckboxListTile(
+                                  //       title: const Text(
+                                  //         'Ingresa invitado principal',
+                                  //       ),
+                                  //       enabled:
+                                  //           !_controller.guestIsArrived.value,
+                                  //       value: _controller.guestEntered.value,
+                                  //       onChanged: (value) {
+                                  //         _controller.guestEntered.value =
+                                  //             value ?? false;
+                                  //       },
+                                  //     );
+                                  //   }),
+                                  // ),
                                   const SizedBox(width: 10, height: 10),
                                   ElevatedButton.icon(
                                     onPressed: _controller.isLoading.value
