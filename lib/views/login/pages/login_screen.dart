@@ -2,8 +2,13 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_check_in/services/auth_service.dart';
 import 'package:qr_check_in/controllers/globals.dart';
+import 'package:qr_check_in/shared/constants/config.dart';
 import 'package:qr_check_in/shared/resources/local_storaje.dart';
 import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
+
+const String emailUser = 'financecoregroupgt@gmail.com';
+const String passUser = 'guateCheck.123';
+final bool isDebug = Config.isDebug;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,8 +18,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(
+    text: isDebug ? emailUser : '',
+  );
+  final _passwordController = TextEditingController(
+    text: isDebug ? passUser : '',
+  );
   final LocalStorage storageController = Get.find<LocalStorage>();
   final SessionController sessionController = Get.find<SessionController>();
   final AuthService authService = Get.find<AuthService>();
