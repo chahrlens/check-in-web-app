@@ -28,6 +28,8 @@ class _LoginPageState extends State<LoginPage> {
   final SessionController sessionController = Get.find<SessionController>();
   final AuthService authService = Get.find<AuthService>();
 
+  RxBool showPassword = false.obs;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -150,16 +152,28 @@ class _LoginPageState extends State<LoginPage> {
                         keyboardType: TextInputType.emailAddress,
                       ),
                       const SizedBox(height: 16),
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Contraseña',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.lock),
-                        ),
-                        onSubmitted: (_) => _login(),
-                      ),
+                      Obx(() {
+                        return TextField(
+                          controller: _passwordController,
+                          obscureText: !showPassword.value,
+                          decoration: InputDecoration(
+                            labelText: 'Contraseña',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                showPassword.value
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                showPassword.value = !showPassword.value;
+                              },
+                            ),
+                          ),
+                          onSubmitted: (_) => _login(),
+                        );
+                      }),
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
