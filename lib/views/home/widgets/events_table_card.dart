@@ -92,8 +92,87 @@ class EventsTableCard extends StatelessWidget {
                                   Colors.blue,
                                 ),
                               ),
-                              onPressed: () =>
-                                  QRPrintService.openPrintWindow(item),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Instrucciones de Impresión'),
+                                      content: SingleChildScrollView(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Para obtener los mejores resultados, siga estas instrucciones:',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            ListTile(
+                                              leading: Icon(Icons.browser_updated, color: Colors.blue),
+                                              dense: true,
+                                              title: Text('Utilice Google Chrome para mejores resultados'),
+                                            ),
+                                            ListTile(
+                                              leading: Icon(Icons.crop_free, color: Colors.blue),
+                                              dense: true,
+                                              title: Text('Seleccione "Sin márgenes" o "Ninguno" en la configuración de impresión'),
+                                            ),
+                                            ListTile(
+                                              leading: Icon(Icons.description, color: Colors.blue),
+                                              dense: true,
+                                              title: Text('Verifique que el tamaño de papel sea Carta/Letter'),
+                                            ),
+                                            ListTile(
+                                              leading: Icon(Icons.screen_rotation, color: Colors.blue),
+                                              dense: true,
+                                              title: Text('Configure orientación Horizontal/Landscape'),
+                                            ),
+                                            ListTile(
+                                              leading: Icon(Icons.format_indent_decrease, color: Colors.blue),
+                                              dense: true,
+                                              title: Text('Desactive la opción "Encabezados y pies de página"'),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            const Text(
+                                              'Nota: Cada página mostrará 2 invitaciones correctamente formateadas.',
+                                              style: TextStyle(fontStyle: FontStyle.italic),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          style: ButtonStyle(
+                                            foregroundColor: WidgetStateProperty.all<Color>(
+                                              Colors.grey,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        ElevatedButton(
+                                          style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all<Color>(
+                                              Colors.blue,
+                                            ),
+                                            foregroundColor: WidgetStateProperty.all<Color>(
+                                              Colors.white,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            QRPrintService.openPrintWindow(item);
+                                          },
+                                          child: const Text('Continuar e Imprimir'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
                               icon: const Tooltip(
                                 message: 'Imprimir pase a invitados',
                                 child: Icon(Icons.print),
