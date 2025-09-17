@@ -32,7 +32,7 @@ class ManageEventController extends GetxController {
       //Host data
       firstNameCtrl.text = selectedData!.host.firstName;
       lastNameCtrl.text = selectedData!.host.lastName;
-      roleCtrl.text = selectedData!.host.role;
+      //roleCtrl.text = '';
       dpiCtrl.text = selectedData!.host.dpi;
       nitCtrl.text = selectedData!.host.nit;
       phoneCtrl.text = selectedData!.host.phone;
