@@ -439,6 +439,7 @@ class ReservationMember {
   final int reservationId;
   final int personId;
   final String uuidCode;
+  final String attendanceStatus;
   final int status;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -451,6 +452,7 @@ class ReservationMember {
     required this.uuidCode,
     required this.status,
     required this.createdAt,
+    this.attendanceStatus = '',
     this.updatedAt,
     required this.member,
   });
@@ -461,6 +463,7 @@ class ReservationMember {
       reservationId: json['reservation_id'] ?? 0,
       personId: json['person_id'] ?? 0,
       uuidCode: json['uuid_code'] ?? '',
+      attendanceStatus: json['attendance_status'] ?? '',
       status: json['status'] ?? 0,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: json['updated_at'] != null
@@ -468,6 +471,19 @@ class ReservationMember {
           : null,
       member: Guest.fromJson(json['member']),
     );
+  }
+
+  String get attendanceStatusLabel {
+    switch (attendanceStatus) {
+      case 'PENDING':
+        return 'Pendiente';
+      case 'USED':
+        return 'Confirmado';
+      case 'CANCELLED':
+        return 'Cancelado';
+      default:
+        return 'Desconocido';
+    }
   }
 }
 

@@ -1,11 +1,12 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:qr_check_in/services/qr_print_service.dart';
 import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
 import 'package:qr_check_in/widgets/datatable/common_data_table.dart';
 import 'package:qr_check_in/views/home/controllers/home_controller.dart';
+import 'package:qr_check_in/views/home/widgets/printing_instructions.dart';
 import 'package:qr_check_in/widgets/datatable/custom_data_table_widget_v2.dart';
-import 'package:qr_check_in/services/qr_print_service.dart';
 
 class EventsTableCard extends StatelessWidget {
   const EventsTableCard({super.key});
@@ -97,56 +98,17 @@ class EventsTableCard extends StatelessWidget {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title: const Text('Instrucciones de Impresión'),
-                                      content: SingleChildScrollView(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Para obtener los mejores resultados, siga estas instrucciones:',
-                                              style: TextStyle(fontWeight: FontWeight.bold),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            ListTile(
-                                              leading: Icon(Icons.browser_updated, color: Colors.blue),
-                                              dense: true,
-                                              title: Text('Utilice Google Chrome para mejores resultados'),
-                                            ),
-                                            ListTile(
-                                              leading: Icon(Icons.crop_free, color: Colors.blue),
-                                              dense: true,
-                                              title: Text('Seleccione "Sin márgenes" o "Ninguno" en la configuración de impresión'),
-                                            ),
-                                            ListTile(
-                                              leading: Icon(Icons.description, color: Colors.blue),
-                                              dense: true,
-                                              title: Text('Verifique que el tamaño de papel sea Carta/Letter'),
-                                            ),
-                                            ListTile(
-                                              leading: Icon(Icons.screen_rotation, color: Colors.blue),
-                                              dense: true,
-                                              title: Text('Configure orientación Horizontal/Landscape'),
-                                            ),
-                                            ListTile(
-                                              leading: Icon(Icons.format_indent_decrease, color: Colors.blue),
-                                              dense: true,
-                                              title: Text('Desactive la opción "Encabezados y pies de página"'),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            const Text(
-                                              'Nota: Cada página mostrará 2 invitaciones correctamente formateadas.',
-                                              style: TextStyle(fontStyle: FontStyle.italic),
-                                            ),
-                                          ],
-                                        ),
+                                      title: const Text(
+                                        'Instrucciones de Impresión',
                                       ),
+                                      content: PrintingInstructions(),
                                       actions: [
                                         TextButton(
                                           style: ButtonStyle(
-                                            foregroundColor: WidgetStateProperty.all<Color>(
-                                              Colors.grey,
-                                            ),
+                                            foregroundColor:
+                                                WidgetStateProperty.all<Color>(
+                                                  Colors.grey,
+                                                ),
                                           ),
                                           onPressed: () {
                                             Navigator.of(context).pop();
@@ -155,18 +117,24 @@ class EventsTableCard extends StatelessWidget {
                                         ),
                                         ElevatedButton(
                                           style: ButtonStyle(
-                                            backgroundColor: WidgetStateProperty.all<Color>(
-                                              Colors.blue,
-                                            ),
-                                            foregroundColor: WidgetStateProperty.all<Color>(
-                                              Colors.white,
-                                            ),
+                                            backgroundColor:
+                                                WidgetStateProperty.all<Color>(
+                                                  Colors.blue,
+                                                ),
+                                            foregroundColor:
+                                                WidgetStateProperty.all<Color>(
+                                                  Colors.white,
+                                                ),
                                           ),
                                           onPressed: () {
                                             Navigator.of(context).pop();
-                                            QRPrintService.openPrintWindow(item);
+                                            QRPrintService.openPrintWindow(
+                                              item,
+                                            );
                                           },
-                                          child: const Text('Continuar e Imprimir'),
+                                          child: const Text(
+                                            'Continuar e Imprimir',
+                                          ),
                                         ),
                                       ],
                                     );
@@ -247,9 +215,19 @@ class EventsTableCard extends StatelessWidget {
                                     ],
                                   ),
                                 ),
+                                PopupMenuItem<int>(
+                                  value: 1,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.list, color: Colors.lightBlue),
+                                      SizedBox(width: 8),
+                                      Text('Ver listado de invitados'),
+                                    ],
+                                  ),
+                                ),
                                 PopupMenuDivider(),
                                 PopupMenuItem(
-                                  value: 1,
+                                  value: 2,
                                   child: Row(
                                     children: [
                                       Icon(Icons.add, color: Colors.lightBlue),
@@ -259,7 +237,7 @@ class EventsTableCard extends StatelessWidget {
                                   ),
                                 ),
                                 PopupMenuItem(
-                                  value: 2,
+                                  value: 3,
                                   child: Row(
                                     children: [
                                       Icon(
@@ -273,7 +251,7 @@ class EventsTableCard extends StatelessWidget {
                                 ),
                                 PopupMenuDivider(),
                                 PopupMenuItem(
-                                  value: 3,
+                                  value: 4,
                                   child: Row(
                                     children: [
                                       Icon(
@@ -294,15 +272,20 @@ class EventsTableCard extends StatelessWidget {
                                   );
                                 } else if (value == 1) {
                                   Get.toNamed(
+                                    RouteConstants.listGuests,
+                                    arguments: {'data': item},
+                                  );
+                                } else if (value == 2) {
+                                  Get.toNamed(
                                     RouteConstants.manageEvent,
                                     arguments: {'data': item, 'isEdit': true},
                                   );
-                                } else if (value == 2) {
+                                } else if (value == 3) {
                                   Get.toNamed(
                                     RouteConstants.manageGuests,
                                     arguments: {'data': item},
                                   );
-                                } else if (value == 3) {
+                                } else if (value == 4) {
                                   Get.toNamed(
                                     RouteConstants.removePasses,
                                     arguments: {'data': item},

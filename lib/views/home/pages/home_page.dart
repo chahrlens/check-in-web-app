@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                           prefixIcon: Icons.search,
                         ),
                         SizedBox(
-                          width: responsiveWidth,
+                          width: responsiveWidth * 1.4,
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -104,11 +104,19 @@ class _HomePageState extends State<HomePage> with RouteAware {
                                   icon: const Icon(Icons.check),
                                   label: const Text('Check-In'),
                                 ),
+                                const SizedBox(width: 12),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    Get.toNamed(RouteConstants.updatePerson);
+                                  },
+                                  icon: const Icon(Icons.person),
+                                  label: const Text('Actualizar persona'),
+                                ),
                                 const SizedBox(width: 24),
                                 ElevatedButton.icon(
                                   onPressed: _start,
                                   icon: const Icon(Icons.refresh),
-                                  label: const Text('Reiniciar'),
+                                  label: const Text('Actualizar'),
                                 ),
                               ],
                             ),
