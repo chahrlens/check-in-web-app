@@ -110,9 +110,10 @@ class CheckInService extends BaseService {
           message: 'Invalid guest ID',
         );
       }
+      final jsonData = json.encode(guest.toJson());
       final response = await httpClient.put(
         buildUri('/check-in/v1/person/${guest.id}'),
-        body: json.encode(guest.toJson()),
+        body: jsonData,
         headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);

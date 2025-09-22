@@ -91,20 +91,25 @@ class _UpdateMemberPageState extends State<UpdateMemberPage> {
                       icon: const Icon(Icons.arrow_back),
                       label: const Text('Regresar'),
                     ),
-                    ElevatedButton.icon(
-                      style: context.elevatedPrimaryButtonStyle,
-                      onPressed: _controller.isLoading.value
-                          ? null
-                          : () async {
-                              if (_formKey.currentState!.validate()) {
-                                final success = await _controller.updateMember();
-                                if (context.mounted && success) {
-                                  Get.back();
+                    Obx(
+                      () => ElevatedButton.icon(
+                        style: context.elevatedPrimaryButtonStyle,
+                        onPressed:
+                            _controller.isLoading.value ||
+                                !_controller.enableSubmit.value
+                            ? null
+                            : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  final success = await _controller
+                                      .updateMember();
+                                  if (context.mounted && success) {
+                                    Get.back();
+                                  }
                                 }
-                              }
-                            },
-                      icon: const Icon(Icons.save),
-                      label: const Text('Guardar'),
+                              },
+                        icon: const Icon(Icons.save),
+                        label: const Text('Guardar'),
+                      ),
                     ),
                   ],
                 ),

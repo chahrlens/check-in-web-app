@@ -23,12 +23,31 @@ class UpdateMemberFormWidget extends StatelessWidget {
               minHeight: 200,
               minWidth: double.infinity,
             ),
-            child: const Center(
-              child: Text('Escanee un código QR para actualizar un invitado'),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.qr_code_scanner,
+                      size: 48,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Escanea un código QR o ingresa un código para cargar los datos del miembro',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         }
         return Form(
+          key: formKey,
           child: SizedBox(
             width: double.infinity,
             child: Wrap(
@@ -43,6 +62,7 @@ class UpdateMemberFormWidget extends StatelessWidget {
                   hintText: 'Ingrese los nombres',
                   width: inputWidth,
                   prefixIcon: Icons.person,
+                  validator: controller.validateGuestName,
                 ),
                 CustomInputWidget(
                   controller: controller.lastName,
@@ -50,6 +70,7 @@ class UpdateMemberFormWidget extends StatelessWidget {
                   hintText: 'Ingrese los apellidos',
                   width: inputWidth,
                   prefixIcon: Icons.person,
+                  validator: controller.validateGuestLastName,
                 ),
                 CustomInputWidget(
                   controller: controller.dpi,
@@ -57,12 +78,14 @@ class UpdateMemberFormWidget extends StatelessWidget {
                   hintText: 'Ingrese el DPI',
                   width: inputWidth,
                   prefixIcon: Icons.badge,
+                  validator: controller.validateDPI,
                 ),
                 CustomInputWidget(
                   controller: controller.nit,
                   label: 'NIT',
                   hintText: 'Ingrese el NIT',
                   width: inputWidth,
+                  validator: controller.validateNIT,
                   prefixIcon: Icons.confirmation_number,
                 ),
                 CustomInputWidget(
@@ -71,6 +94,7 @@ class UpdateMemberFormWidget extends StatelessWidget {
                   hintText: 'Ingrese el teléfono',
                   width: inputWidth,
                   prefixIcon: Icons.phone,
+                  validator: controller.validatePhone,
                 ),
                 CustomInputWidget(
                   controller: controller.email,
@@ -78,6 +102,7 @@ class UpdateMemberFormWidget extends StatelessWidget {
                   hintText: 'Ingrese el correo electrónico',
                   width: inputWidth,
                   prefixIcon: Icons.email,
+                  validator: controller.validateEmail,
                 ),
               ],
             ),
