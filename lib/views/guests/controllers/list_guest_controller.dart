@@ -95,6 +95,7 @@ class ListGuestController extends GetxController {
       final normalizedMemberName = normalizeText(item.memberName.toLowerCase());
       final normalizedMemberDpi = item.memberDpi.toLowerCase();
       final normalizedStatus = normalizeText(item.attendanceStatus.toLowerCase());
+      final normalizedTable = normalizeText(item.tables.toLowerCase());
 
       return normalizedFamilyName.contains(searchQuery) ||
              normalizedMainGuestName.contains(searchQuery) ||
@@ -102,6 +103,7 @@ class ListGuestController extends GetxController {
              normalizedMemberName.contains(searchQuery) ||
              normalizedMemberDpi.contains(searchQuery) ||
              normalizedStatus.contains(searchQuery) ||
+             normalizedTable.contains(searchQuery) ||
              item.code.contains(searchQuery);
     }).toList();
   }

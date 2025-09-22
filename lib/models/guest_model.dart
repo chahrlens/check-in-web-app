@@ -65,12 +65,35 @@ class Guest {
     );
   }
 
+  Guest copyWith({
+    String? firstName,
+    String? lastName,
+    String? dpi,
+    String? nit,
+    String? phone,
+    String? email,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Guest(
+      id: id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      role: role,
+      dpi: dpi ?? this.dpi,
+      nit: nit ?? this.nit,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     if (firstName == "anonymous") {
       return {"isAnonymous": true};
     }
     return {
-      "id": id == 0 ? null : id,
       "firstName": firstName,
       "lastName": lastName,
       "role": role,

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:qr_check_in/views/guests/pages/update_member_page.dart';
 import 'package:qr_check_in/views/home/pages/home_page.dart';
 import 'package:qr_check_in/views/guests/pages/guest_page.dart';
 import 'package:qr_check_in/views/login/pages/login_screen.dart';
@@ -57,5 +58,9 @@ final List<GetPage<dynamic>> PRIMARY_ROUTING_PATHS = [
     name: RouteConstants.listGuests,
     page: () => const ListGuestPage(),
     transition: Transition.fadeIn,
+  ),
+  GetPage(
+    name: RouteConstants.updatePerson,
+    page: () => const UpdateMemberPage(),
   ),
 ];

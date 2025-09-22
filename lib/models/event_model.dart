@@ -382,6 +382,9 @@ class Family implements HasIdLabel {
     };
   }
 
+  String get familyTableList =>
+      familyTables.map((e) => e.eventTable?.name ?? '').join(', ');
+
   @override
   String get identifier => id.toString();
   @override
