@@ -26,11 +26,11 @@ class QRPrintService {
             member: Guest.instance(),
           ),
         );
-        if (member.uuidCode == uuid) {
-          // Encontrar la mesa asociada a la familia
-          final tableId = reservation.family.familyTables.first.tableId;
+
+        if (member.uuidCode == uuid && member.tableId > 0) {
+          // Usar directamente el tableId del miembro de reservación
           final table = event.eventTables.firstWhere(
-            (t) => t.id == tableId,
+            (t) => t.id == member.tableId,
             orElse: () => EventTable(
               id: 0,
               eventId: 0,

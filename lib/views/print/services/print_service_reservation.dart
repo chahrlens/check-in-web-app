@@ -12,6 +12,9 @@ class QRPrintServiceReservation {
     EventTable table,
     List<ReservationMember> reservations,
   ) {
+    // Filtrar solo los miembros de reserva que tienen el tableId correcto
+    final filteredReservations = reservations.where((member) => member.tableId == table.id).toList();
+
     final htmlContent =
         '''
       <!DOCTYPE html>
@@ -100,13 +103,14 @@ class QRPrintServiceReservation {
             <button onclick="window.close()">Cerrar</button>
           </div>
           <div class="container">
-            ${reservations.map((reservation) => '''
+            ${filteredReservations.map((reservation) => '''
               <div class="qr-card">
                 <img
                   class="qr"
                   src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(reservation.uuidCode)}"
                 />
-                <div class="guest-name">${_escapeHtml(reservation.member.fullName)}<br/>Mesa número: #${_escapeHtml(table.tableNumber.toString())}</div>
+                <div class="guest-name">${_escapeHtml(reservation.member.fullName)}<br/></div>
+                <div class="spaces">Mesa número: #${_escapeHtml(table.tableNumber.toString())}</div>
               </div>
             ''').join('')}
           </div>
