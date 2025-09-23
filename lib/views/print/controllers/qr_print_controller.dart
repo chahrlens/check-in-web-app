@@ -27,11 +27,13 @@ class QrPrintController extends GetxController {
     try {
       final table = selectedTable.value;
       if (table == null || selectedData == null) return;
-      // Obtener todos los ReservationMember de las reservaciones de la mesa
+
+      // Obtener todos los ReservationMember asignados directamente a esta mesa por tableId
       final reservationMembers = selectedData!.reservations
-          .where((r) => r.family.familyTables.map((e) => e.id).contains(table.id))
           .expand((r) => r.reservationMembers)
+          .where((member) => member.tableId == table.id)
           .toList();
+
       QRPrintServiceReservation.openPrintWindowForTable(table, reservationMembers);
     } catch (e) {
       // Manejo de errores

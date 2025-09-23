@@ -18,6 +18,7 @@ class QRPrintService {
           orElse: () => ReservationMember(
             id: 0,
             reservationId: 0,
+            tableId: 0,
             personId: 0,
             uuidCode: '',
             status: 0,

@@ -104,26 +104,26 @@ class _QRPrintPageState extends State<QRPrintPage> {
                               ),
                             );
                           }
-                          // Filtrar las reservaciones por la mesa seleccionada
-                          final reservations =
-                              _controller.selectedData?.reservations
-                                  .where((r) => r.family.familyTables.map((e) => e.id).contains(selectedTable.id))
-                                  .toList() ??
-                              [];
-                          if (reservations.isEmpty) {
+                          final allMembers = _controller.selectedData?.reservations
+                              .expand((reservation) => reservation.reservationMembers)
+                              .where((member) => member.tableId == selectedTable.id)
+                              .toList() ?? [];
+
+                          if (allMembers.isEmpty) {
                             return Center(
                               child: Text(
-                                'No hay reservaciones para esta mesa.',
+                                'No hay reservaciones asignadas a esta mesa.',
                               ),
                             );
                           }
+
                           return SizedBox(
                             width: double.infinity,
                             child: Wrap(
                               spacing: 8.0,
                               runSpacing: 8.0,
                               alignment: WrapAlignment.spaceAround,
-                              children: reservations.expand((e) => e.reservationMembers).map((member) {
+                              children: allMembers.map((member) {
                                 return SizedBox(
                                   width: cardWidth,
                                   child: PrintCardWidget(

@@ -411,16 +411,17 @@ class FamilyTable {
   });
 
   factory FamilyTable.fromJson(Map<String, dynamic> json) {
+    final data = json['family_table'] ?? json;
     return FamilyTable(
-      id: json['id'] ?? 0,
-      familyId: json['family_id'] ?? 0,
-      tableId: json['table_id'] ?? 0,
-      status: json['status'] ?? 0,
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'])
+      id: data['id'] ?? 0,
+      familyId: data['family_id'] ?? 0,
+      tableId: data['table_id'] ?? 0,
+      status: data['status'] ?? 0,
+      createdAt: DateTime.parse(data['created_at']),
+      updatedAt: data['updated_at'] != null
+          ? DateTime.tryParse(data['updated_at'])
           : null,
-      eventTable: EventTable.fromJson(json['event_table']),
+      eventTable: EventTable.fromJson(data['event_table']),
     );
   }
 
@@ -440,6 +441,7 @@ class FamilyTable {
 class ReservationMember {
   final int id;
   final int reservationId;
+  final int tableId;
   final int personId;
   final String uuidCode;
   final String attendanceStatus;
@@ -451,6 +453,7 @@ class ReservationMember {
   ReservationMember({
     required this.id,
     required this.reservationId,
+    required this.tableId,
     required this.personId,
     required this.uuidCode,
     required this.status,
@@ -464,6 +467,7 @@ class ReservationMember {
     return ReservationMember(
       id: json['id'] ?? 0,
       reservationId: json['reservation_id'] ?? 0,
+      tableId: json['table_id'] ?? 0,
       personId: json['person_id'] ?? 0,
       uuidCode: json['uuid_code'] ?? '',
       attendanceStatus: json['attendance_status'] ?? '',
