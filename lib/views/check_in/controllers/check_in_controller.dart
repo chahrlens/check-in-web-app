@@ -46,7 +46,7 @@ class CheckInController extends GetxController {
       // Llamar al servicio para verificar el QR
       final result = await _checkInService.getCheckInDetails(qrCode);
 
-      if (result.left != null) {
+      if (result.left != null && result.right.success) {
         // La consulta fue exitosa, mostramos los datos
         checkInData = result.left;
         _fillCheckInDataFields();
