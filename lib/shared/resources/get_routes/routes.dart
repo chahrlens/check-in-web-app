@@ -6,6 +6,7 @@ class RouteConstants {
   static const String manageGuests = '$event/manage-guests';
   static const String updatePerson = '$event/update-person';
   static const String listGuests = '$event/list-guests';
+  static const String bulkUploadGuests = '$event/bulk-upload-guests';
   static const String checkIn = '$event/check-in';
   static const String printInvitations = '$event/print-invitations';
   static const String removePasses = '$event/remove-passes';

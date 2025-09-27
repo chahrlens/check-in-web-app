@@ -249,9 +249,22 @@ class EventsTableCard extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                PopupMenuDivider(),
                                 PopupMenuItem(
                                   value: 4,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.upload_file,
+                                        color: Colors.lightBlue,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Cargar masiva invitados'),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuDivider(),
+                                PopupMenuItem(
+                                  value: 5,
                                   child: Row(
                                     children: [
                                       Icon(
@@ -286,6 +299,11 @@ class EventsTableCard extends StatelessWidget {
                                     arguments: {'data': item},
                                   );
                                 } else if (value == 4) {
+                                  Get.toNamed(
+                                    RouteConstants.bulkUploadGuests,
+                                    arguments: {'data': item},
+                                  );
+                                } else if (value == 5) {
                                   Get.toNamed(
                                     RouteConstants.removePasses,
                                     arguments: {'data': item},

@@ -306,6 +306,70 @@ class EventReservation {
     };
   }
 
+  factory EventReservation.fromJson(Map<String, dynamic> json) {
+    // Crear la familia
+    Family family;
+
+    if (json['family'] != null) {
+      final familyJson = json['family'] as Map<String, dynamic>;
+      final familyName = familyJson['familyName'] ?? 'Sin Nombre';
+
+      if (familyJson['id'] != null) {
+        // Si tiene ID, crear una familia con ese ID
+        family = Family(
+          id: familyJson['id'],
+          name: familyName,
+          status: 1,
+          createdAt: DateTime.now(),
+          familyTables: [],
+        );
+      } else {
+        // Si no tiene ID, crear una familia nueva
+        family = Family.instance(name: familyName);
+      }
+
+      // Asignar mesas a la familia si existen
+      if (json['tableIds'] != null && json['tableIds'] is List) {
+        final tableIds = List<int>.from(json['tableIds']);
+        // Crear FamilyTables para cada ID de mesa
+        family = Family(
+          id: family.id,
+          name: family.name,
+          status: family.status,
+          createdAt: family.createdAt,
+          updatedAt: family.updatedAt,
+          familyTables: tableIds.map((tableId) =>
+            FamilyTable(
+              id: 0,
+              familyId: family.id,
+              tableId: tableId,
+              status: 1,
+              createdAt: DateTime.now(),
+              updatedAt: null,
+            )
+          ).toList(),
+        );
+      }
+    } else {
+      // Si no hay información de familia, crear una por defecto
+      family = Family.instance();
+    }
+
+    // Crear lista de invitados
+    List<Guest> guests = [];
+    if (json['guests'] != null && json['guests'] is List) {
+      guests = (json['guests'] as List)
+          .map((guestJson) => Guest.fromJson(guestJson))
+          .toList();
+    }
+
+    return EventReservation(
+      eventId: json['eventId'],
+      family: family,
+      details: guests,
+    );
+  }
+
   factory EventReservation.instance({
     required int eventId,
     required Family family,

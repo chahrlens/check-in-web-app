@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:qr_check_in/models/either.dart';
 import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/models/event_model.dart';
@@ -273,6 +275,46 @@ class EventService extends BaseService {
         statusCode: 500,
         success: false,
         message: 'An error occurred',
+      );
+    }
+  }
+
+  Future<Either<List<EventReservation>?, ApiResponse>> uploadGuestFile({
+    required int eventId,
+    required Uint8List file,
+    required String fileName,
+  }) async {
+    try {
+      var uri = buildUri('/event/v1/events/guest-upload/$eventId');
+      var request = http.MultipartRequest('POST', uri);
+
+      request.headers.addAll(_authHeaders);
+
+      request.fields['eventId'] = eventId.toString();
+
+      request.files.add(
+        http.MultipartFile.fromBytes('file', file, filename: fileName),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final decodedJson = json.decode(response.body);
+        Iterable listData = decodedJson['data']['familyReservations'] ?? [];
+        final data = listData.map((e) => EventReservation.fromJson(e)).toList();
+        return Either(left: data, right: ApiResponse.fromResponse(response));
+      }
+      return Either(left: null, right: ApiResponse.fromResponse(response));
+    } catch (e) {
+      debugLog(e.toString());
+      return Either(
+        left: null,
+        right: ApiResponse(
+          statusCode: 500,
+          success: false,
+          message: 'An error occurred',
+        ),
       );
     }
   }

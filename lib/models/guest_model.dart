@@ -24,14 +24,19 @@ class Guest {
   });
 
   factory Guest.fromJson(Map<String, dynamic> json) {
+    String phoneValue = '';
+    if (json['phone'] != null) {
+      phoneValue = json['phone'].toString();
+    }
+
     return Guest(
-      id: json['id'] ?? 0,
-      firstName: json['first_name'] ?? '',
-      lastName: json['last_name'] ?? '',
+      id: json['id'] ?? json['example_id'] ?? 0,
+      firstName: json['firstName'] ?? json['first_name'] ?? '',
+      lastName: json['lastName'] ?? json['last_name'] ?? '',
       role: json['role'] ?? '',
       dpi: json['dpi'] ?? '',
       nit: json['nit'] ?? '',
-      phone: json['phone'] ?? '',
+      phone: phoneValue,
       email: json['email'] ?? '',
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
@@ -90,7 +95,7 @@ class Guest {
   }
 
   Map<String, dynamic> toJson() {
-    if (firstName == "anonymous") {
+    if (firstName == "anonymous" || firstName.toLowerCase() == "invitado") {
       return {"isAnonymous": true};
     }
     return {
