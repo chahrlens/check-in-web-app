@@ -1,10 +1,11 @@
 import 'package:get/get.dart';
-import 'package:qr_check_in/services/toast_service.dart';
 import 'navigation_sidebar.dart';
 import 'package:flutter/material.dart';
 import '../commons/global_loader_widget.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/shared/resources/custom_style.dart';
+import 'package:qr_check_in/controllers/loader_controller.dart';
 import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
 
 class ResponsiveSidebarLayout extends StatelessWidget {
@@ -259,6 +260,7 @@ class ResponsiveSimpleLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LoaderController _loaderController = Get.find<LoaderController>();
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return LayoutBuilder(
@@ -296,41 +298,54 @@ class ResponsiveSimpleLayout extends StatelessWidget {
           child: CustomPaint(painter: WavePainter(color: colorScheme.primary)),
         );
 
-        Widget stackedContent = Stack(
-          children: [
-            Positioned.fill(
-              child: Column(
-                children: [
-                  backgroundWave,
-                  Expanded(child: Container()),
-                ],
-              ),
+        List<Widget> stackedContent = [
+          Positioned.fill(
+            child: Column(
+              children: [
+                backgroundWave,
+                Expanded(child: Container()),
+              ],
             ),
-            Positioned(
-              top: -10,
-              left: 58,
-              right: 24,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: CustomStyle.layoutTitleText(context)),
-                  const SizedBox(height: 4),
-                  if (description.isNotEmpty)
-                    Text(
-                      description,
-                      style: CustomStyle.layoutDescriptionText(context),
-                    ),
-                ],
-              ),
+          ),
+          Positioned(
+            top: -10,
+            left: 58,
+            right: 24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: CustomStyle.layoutTitleText(context)),
+                const SizedBox(height: 4),
+                if (description.isNotEmpty)
+                  Text(
+                    description,
+                    style: CustomStyle.layoutDescriptionText(context),
+                  ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.only(top: constraints.maxHeight * 0.09),
-              child: SizedBox(width: double.infinity, child: content),
-            ),
-          ],
-        );
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: constraints.maxHeight * 0.09),
+            child: SizedBox(width: double.infinity, child: content),
+          ),
 
-        return Scaffold(appBar: appBar, body: stackedContent);
+        ];
+
+        return Scaffold(
+          appBar: appBar,
+          body: Obx(() {
+            return Stack(children: [...stackedContent,
+            if (_loaderController.isLoading.value) ... [
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.3),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            ]
+            ]);
+          }),
+        );
       },
     );
   }
