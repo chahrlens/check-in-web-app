@@ -109,8 +109,9 @@ class QRPrintServiceReservation {
                   class="qr"
                   src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(reservation.uuidCode)}"
                 />
-                <div class="guest-name">${_escapeHtml(reservation.member.fullName)}<br/></div>
-                <div class="spaces">Mesa número: #${_escapeHtml(table.tableNumber.toString())}</div>
+                <div class="guest-name">${_escapeHtml(reservation.member.fullName)}<br/>
+                    Mesa número: #${_escapeHtml(table.tableNumber.toString())}
+                </div>
               </div>
             ''').join('')}
           </div>

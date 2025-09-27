@@ -34,7 +34,10 @@ class QrPrintController extends GetxController {
           .where((member) => member.tableId == table.id)
           .toList();
 
-      QRPrintServiceReservation.openPrintWindowForTable(table, reservationMembers);
+      QRPrintServiceReservation.openPrintWindowForTable(
+        table,
+        reservationMembers,
+      );
     } catch (e) {
       // Manejo de errores
     } finally {
@@ -45,7 +48,7 @@ class QrPrintController extends GetxController {
   Future<void> printSingleQrCode(ReservationMember reservation) async {
     isLoading.value = true;
     try {
-      final table = selectedTable.value;
+      final EventTable? table = selectedTable.value;
       if (table == null || selectedData == null) return;
       QRPrintServiceReservation.openPrintWindowForTable(table, [reservation]);
     } catch (e) {

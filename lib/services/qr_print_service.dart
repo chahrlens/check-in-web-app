@@ -59,8 +59,8 @@ class QRPrintService {
         buffer.write('<div class="page-container">');
 
         // Primera tarjeta
-        final member1 = members[i];
-        final tableNumber1 = findTableNumber(member1.uuidCode);
+        final ReservationMember member1 = members.elementAt(i);
+        final int? tableNumber1 = findTableNumber(member1.uuidCode);
         buffer.write('''
           <div class="qr-card">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(member1.uuidCode)}"/>
@@ -71,13 +71,14 @@ class QRPrintService {
 
         // Segunda tarjeta (si existe)
         if (i + 1 < members.length) {
-          final member2 = members[i + 1];
-          final tableNumber2 = findTableNumber(member2.uuidCode);
+          final member2 = members.elementAt(i + 1);
+          final int? tableNumber2 = findTableNumber(member2.uuidCode);
           buffer.write('''
             <div class="qr-card">
               <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(member2.uuidCode)}"/>
-              <div class="guest-name">${_escapeHtml(member2.member.fullName)}</div>
-              <div class="spaces">Mesa número: #${tableNumber2 ?? '--'}</div>
+              <div class="guest-name">${_escapeHtml(member2.member.fullName)}<br/>
+              Mesa número: #${tableNumber2 ?? '--'}
+              </div>
             </div>
           ''');
         }
