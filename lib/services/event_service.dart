@@ -134,6 +134,27 @@ class EventService extends BaseService {
     }
   }
 
+  ///event/reservations-members-bulk
+  Future<ApiResponse> addReservationsBulk(List<EventReservation> reservations) async {
+    try {
+      final data = reservations.map((e) => e.toJson()).toList();
+      debugLog('Bulk Reservation Data: $data');
+      final response = await httpClient.post(
+        buildUri('/event/v1/events/reservations-members-bulk'),
+        body: json.encode(data),
+        headers: _authHeaders,
+      );
+      return ApiResponse.fromResponse(response);
+    } catch (e) {
+      debugLog(e.toString());
+      return ApiResponse(
+        statusCode: 500,
+        success: false,
+        message: 'An error occurred',
+      );
+    }
+  }
+
   Future<ApiResponse> deleteEvent(int eventId) async {
     try {
       final response = await httpClient.delete(

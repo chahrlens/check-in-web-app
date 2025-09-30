@@ -81,6 +81,9 @@ class GuestUploadController extends GetxController {
 
   Future<String?> handleUpload() async {
     try {
+      if (selectedEvent == null) {
+        return 'No event selected';
+      }
       _loaderController.show();
 
       // Use FilePicker to select Excel files specifically
@@ -110,12 +113,6 @@ class GuestUploadController extends GetxController {
       selectedFile.value = pickedFile;
       fileName.value = platformFile.name;
 
-      // Get the current event ID (in a real case)
-      // final eventId = _sessionController.getCurrentEventId(); // Assuming this method exists
-
-      // For testing, we use a fixed ID
-      const int eventId = 1;
-
       // Read the file as bytes
       Uint8List fileBytes;
       if (kIsWeb) {
@@ -135,7 +132,7 @@ class GuestUploadController extends GetxController {
       // Send the file to the server
       final Either<List<EventReservation>?, ApiResponse> response =
           await _eventService.uploadGuestFile(
-            eventId: eventId,
+            eventId: selectedEvent!.id,
             file: fileBytes,
             fileName: pickedFile.name,
           );
@@ -167,23 +164,10 @@ class GuestUploadController extends GetxController {
         return 'Debes seleccionar un archivo primero';
       }
 
-      // Process reservations in batches of 10
-      const int batchSize = 10;
-      bool allSuccess = true;
-      for (int i = 0; i < reservations.length; i += batchSize) {
-        final batch = reservations.skip(i).take(batchSize).toList();
-        final results = await Future.wait([
-          for (EventReservation reservation in batch)
-            _eventService.addReservations(reservation),
-        ]);
-        final batchSuccess = results.every((res) => res.success);
-        if (!batchSuccess) {
-          allSuccess = false;
-          break;
-        }
-      }
-      if (!allSuccess) {
-        return 'Error saving some reservations';
+      final result = await _eventService.addReservationsBulk(reservations);
+      if (!result.success) {
+        _loaderController.hide();
+        return 'Error saving the data: ${result.message}';
       }
 
       // Clean up after saving
