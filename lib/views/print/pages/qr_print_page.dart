@@ -15,6 +15,7 @@ class QRPrintPage extends StatefulWidget {
 
 class _QRPrintPageState extends State<QRPrintPage> {
   late QrPrintController _controller;
+  final ScrollController _scrollController = ScrollController();
 
   final args = Get.arguments ?? {};
 
@@ -48,38 +49,44 @@ class _QRPrintPageState extends State<QRPrintPage> {
                     minHeight: 100.0,
                     child: SizedBox(
                       width: constraints.maxWidth * 0.8,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Obx(
-                          () => Row(
-                            children: _controller.eventTables.map((table) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4.0,
-                                ),
-                                child: ChoiceChip(
-                                  label: Text(
-                                    table.name,
-                                    style: TextStyle(
-                                      color:
-                                          _controller.selectedTable.value ==
-                                              table
-                                          ? Colors.white
-                                          : Colors.black87,
-                                    ),
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        controller: _scrollController,
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          scrollDirection: Axis.horizontal,
+                          child: Obx(
+                            () => Row(
+                              children: _controller.eventTables.map((table) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4.0,
                                   ),
-                                  selected:
-                                      _controller.selectedTable.value == table,
-                                  selectedColor: Colors.blueAccent,
-                                  backgroundColor: Colors.grey[200],
-                                  onSelected: (selected) {
-                                    if (selected) {
-                                      _controller.setSelectedTable(table);
-                                    }
-                                  },
-                                ),
-                              );
-                            }).toList(),
+                                  child: ChoiceChip(
+                                    label: Text(
+                                      table.name,
+                                      style: TextStyle(
+                                        color:
+                                            _controller.selectedTable.value ==
+                                                table
+                                            ? Colors.white
+                                            : Colors.black87,
+                                      ),
+                                    ),
+                                    selected:
+                                        _controller.selectedTable.value ==
+                                        table,
+                                    selectedColor: Colors.blueAccent,
+                                    backgroundColor: Colors.grey[200],
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        _controller.setSelectedTable(table);
+                                      }
+                                    },
+                                  ),
+                                );
+                              }).toList(),
+                            ),
                           ),
                         ),
                       ),
@@ -104,10 +111,18 @@ class _QRPrintPageState extends State<QRPrintPage> {
                               ),
                             );
                           }
-                          final allMembers = _controller.selectedData?.reservations
-                              .expand((reservation) => reservation.reservationMembers)
-                              .where((member) => member.tableId == selectedTable.id)
-                              .toList() ?? [];
+                          final allMembers =
+                              _controller.selectedData?.reservations
+                                  .expand(
+                                    (reservation) =>
+                                        reservation.reservationMembers,
+                                  )
+                                  .where(
+                                    (member) =>
+                                        member.tableId == selectedTable.id,
+                                  )
+                                  .toList() ??
+                              [];
 
                           if (allMembers.isEmpty) {
                             return Center(
@@ -126,9 +141,7 @@ class _QRPrintPageState extends State<QRPrintPage> {
                               children: allMembers.map((member) {
                                 return SizedBox(
                                   width: cardWidth,
-                                  child: PrintCardWidget(
-                                    reservation: member,
-                                  ),
+                                  child: PrintCardWidget(reservation: member),
                                 );
                               }).toList(),
                             ),
