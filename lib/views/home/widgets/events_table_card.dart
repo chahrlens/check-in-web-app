@@ -101,7 +101,17 @@ class EventsTableCard extends StatelessWidget {
                                       title: const Text(
                                         'Instrucciones de Impresión',
                                       ),
-                                      content: PrintingInstructions(),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          PrintingInstructions(),
+                                          const SizedBox(height: 16),
+                                          const Text(
+                                            'Selecciona el formato de impresión:',
+                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
                                       actions: [
                                         TextButton(
                                           style: ButtonStyle(
@@ -133,7 +143,29 @@ class EventsTableCard extends StatelessWidget {
                                             );
                                           },
                                           child: const Text(
-                                            'Continuar e Imprimir',
+                                            'Imprimir 2 por página',
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStateProperty.all<Color>(
+                                                  Colors.green,
+                                                ),
+                                            foregroundColor:
+                                                WidgetStateProperty.all<Color>(
+                                                  Colors.white,
+                                                ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            QRPrintService.openPrintWindow(
+                                              item,
+                                              verticalFormat: true,
+                                            );
+                                          },
+                                          child: const Text(
+                                            'Imprimir 1 por página',
                                           ),
                                         ),
                                       ],
