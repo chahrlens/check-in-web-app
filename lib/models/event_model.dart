@@ -57,7 +57,7 @@ class EventModel {
       description: json['description'] ?? '',
       totalSpaces: json['total_spaces'] ?? 0,
       guestEntered: statics['totalCheckedIn'] ?? 0,
-      totalReservations: statics['totalReservation'] ?? 0,
+      totalReservations: statics['totalreservation'] ?? 0,
       totalFamilies: statics['totalFamilies'] ?? 0,
       eventDate: DateTime.parse(json['event_date']),
       status: json['status'] ?? 0,
@@ -69,6 +69,44 @@ class EventModel {
       eventTables: tables,
       reservations: reservations,
       statistics: Statistics.fromJson(json['statistics']),
+    );
+  }
+
+  factory EventModel.fromDetailJson(
+    EventModel existing,
+    Map<String, dynamic> json,
+  ) {
+    // Obtener las nuevas reservaciones del JSON
+    List<Reservation> newReservations = json['reservations'] != null
+        ? (json['reservations'] as List)
+              .map((e) => Reservation.fromJson(e))
+              .toList()
+        : [];
+
+    // Usar copyWith para mantener los datos existentes y actualizar solo lo necesario
+    return EventModel(
+      id: existing.id,
+      hostId: existing.hostId,
+      name: existing.name,
+      description: existing.description,
+      totalSpaces: existing.totalSpaces,
+      guestEntered:
+          json['statistics']?["summary"]?['totalCheckedIn'] ??
+          existing.guestEntered,
+      totalReservations:
+          json['statistics']?["summary"]?['totalReservation'] ??
+          existing.totalReservations,
+      totalFamilies:
+          json['statistics']?["summary"]?['totalFamilies'] ??
+          existing.totalFamilies,
+      eventDate: existing.eventDate,
+      status: existing.status,
+      createdAt: existing.createdAt,
+      updatedAt: existing.updatedAt,
+      host: existing.host,
+      eventTables: existing.eventTables,
+      reservations: newReservations,
+      statistics: existing.statistics,
     );
   }
 
@@ -113,7 +151,7 @@ class EventModel {
 
   int get tableCount => eventTables.length;
   int get reservationCount => totalReservations;
-  int get availableUnAssigned => totalSpaces - reservationCount;
+  int get availableUnAssigned => statistics?.summary.availableSpaces ?? 0;
   int get availableCount => reservationCount - guestEntered;
 }
 

@@ -1,8 +1,12 @@
 import 'package:get/get.dart';
+import 'package:qr_check_in/controllers/loader_controller.dart';
 import 'package:qr_check_in/models/event_model.dart';
+import 'package:qr_check_in/services/event_service.dart';
 import 'package:qr_check_in/views/guests/models/guest_list_item.dart';
 
 class ListGuestController extends GetxController {
+  final LoaderController _loaderController = Get.find<LoaderController>();
+  final EventService _eventService = EventService();
   EventModel? selectedEvent;
 
   List<Reservation> reservations = <Reservation>[];
@@ -71,9 +75,28 @@ class ListGuestController extends GetxController {
     if (args != null && args['data'] != null && args['data'] is EventModel) {
       selectedEvent = args['data'] as EventModel;
 
-      reservations.assignAll(selectedEvent!.reservations);
+      // reservations.assignAll(selectedEvent!.reservations);
 
-      guestItems.assignAll(GuestListItem.fromReservations(reservations));
+      // guestItems.assignAll(GuestListItem.fromReservations(reservations));
+      fetchEventDetails();
+    }
+  }
+
+  Future<void> fetchEventDetails() async {
+    if (selectedEvent == null) return;
+
+    _loaderController.show();
+    try {
+      final result = await _eventService.getEventDetail(selectedEvent!);
+      if (result.left != null) {
+        selectedEvent = result.left!;
+        reservations.assignAll(selectedEvent!.reservations);
+        guestItems.assignAll(GuestListItem.fromReservations(reservations));
+        update();
+      }
+      _loaderController.hide();
+    } catch (e) {
+      _loaderController.hide();
     }
   }
 
@@ -90,21 +113,25 @@ class ListGuestController extends GetxController {
 
     return guestItems.where((item) {
       final normalizedFamilyName = normalizeText(item.familyName.toLowerCase());
-      final normalizedMainGuestName = normalizeText(item.mainGuestName.toLowerCase());
+      final normalizedMainGuestName = normalizeText(
+        item.mainGuestName.toLowerCase(),
+      );
       final normalizedMainGuestDpi = item.mainGuestDpi.toLowerCase();
       final normalizedMemberName = normalizeText(item.memberName.toLowerCase());
       final normalizedMemberDpi = item.memberDpi.toLowerCase();
-      final normalizedStatus = normalizeText(item.attendanceStatus.toLowerCase());
+      final normalizedStatus = normalizeText(
+        item.attendanceStatus.toLowerCase(),
+      );
       final normalizedTable = normalizeText(item.tables.toLowerCase());
 
       return normalizedFamilyName.contains(searchQuery) ||
-             normalizedMainGuestName.contains(searchQuery) ||
-             normalizedMainGuestDpi.contains(searchQuery) ||
-             normalizedMemberName.contains(searchQuery) ||
-             normalizedMemberDpi.contains(searchQuery) ||
-             normalizedStatus.contains(searchQuery) ||
-             normalizedTable.contains(searchQuery) ||
-             item.code.contains(searchQuery);
+          normalizedMainGuestName.contains(searchQuery) ||
+          normalizedMainGuestDpi.contains(searchQuery) ||
+          normalizedMemberName.contains(searchQuery) ||
+          normalizedMemberDpi.contains(searchQuery) ||
+          normalizedStatus.contains(searchQuery) ||
+          normalizedTable.contains(searchQuery) ||
+          item.code.contains(searchQuery);
     }).toList();
   }
 
@@ -122,7 +149,9 @@ class ListGuestController extends GetxController {
   void filterData(String query) {
     if (selectedEvent != null) {
       if (query.isEmpty) {
-        guestItems.assignAll(GuestListItem.fromReservations(selectedEvent!.reservations));
+        guestItems.assignAll(
+          GuestListItem.fromReservations(selectedEvent!.reservations),
+        );
         reservations.assignAll(selectedEvent!.reservations);
       } else {
         final filteredItems = filterGuestItems(query);

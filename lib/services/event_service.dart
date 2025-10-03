@@ -47,6 +47,33 @@ class EventService extends BaseService {
     }
   }
 
+  Future<Either<EventModel?, ApiResponse>> getEventDetail(EventModel event) async {
+    try {
+      final response = await httpClient.get(
+        buildUri('/event/v1/events/details/${event.id}'),
+        headers: _authHeaders,
+      );
+      final apiResponse = ApiResponse.fromResponse(response);
+      if (response.statusCode == 200) {
+        final decodedJson = json.decode(response.body);
+        final data = decodedJson['data'] ?? {};
+        final eventData = EventModel.fromDetailJson(event, data);
+        return Either(left: eventData, right: apiResponse);
+      }
+      return Either(left: null, right: apiResponse);
+    } catch (e) {
+      debugLog(e.toString());
+      return Either(
+        left: null,
+        right: ApiResponse(
+          statusCode: 500,
+          success: false,
+          message: 'An error occurred',
+        ),
+      );
+    }
+  }
+
   Future<ApiResponse> createEvent({required EventModel data}) async {
     try {
       final body = data.toJson();
@@ -135,7 +162,9 @@ class EventService extends BaseService {
   }
 
   ///event/reservations-members-bulk
-  Future<ApiResponse> addReservationsBulk(List<EventReservation> reservations) async {
+  Future<ApiResponse> addReservationsBulk(
+    List<EventReservation> reservations,
+  ) async {
     try {
       final data = reservations.map((e) => e.toJson()).toList();
       debugLog('Bulk Reservation Data: $data');
