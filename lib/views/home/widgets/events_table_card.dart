@@ -8,9 +8,14 @@ import 'package:qr_check_in/views/home/controllers/home_controller.dart';
 import 'package:qr_check_in/views/home/widgets/printing_instructions.dart';
 import 'package:qr_check_in/widgets/datatable/custom_data_table_widget_v2.dart';
 
-class EventsTableCard extends StatelessWidget {
+class EventsTableCard extends StatefulWidget {
   const EventsTableCard({super.key});
 
+  @override
+  State<EventsTableCard> createState() => _EventsTableCardState();
+}
+
+class _EventsTableCardState extends State<EventsTableCard> {
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
@@ -52,19 +57,16 @@ class EventsTableCard extends StatelessWidget {
                 index,
                 DataRow(
                   cells: [
-                    cell(item.id.toString().padLeft(4, '0'), context),
-                    cell(item.host.fullName, context),
-                    cell(item.description, context),
-                    cell(item.totalSpaces.toString(), context),
-                    cell(item.tableCount.toString(), context),
-                    cell(item.reservationCount.toString(), context),
-                    cell(item.availableUnAssigned.toString(), context),
-                    cell(item.guestEntered.toString(), context),
-                    cell(item.availableCount.toString(), context),
-                    cell(
-                      item.eventDate.toLocal().toString().split(' ')[0],
-                      context,
-                    ),
+                    cell(item.id.toString().padLeft(4, '0')),
+                    cell(item.host.fullName),
+                    cell(item.description),
+                    cell(item.totalSpaces.toString()),
+                    cell(item.tableCount.toString()),
+                    cell(item.reservationCount.toString()),
+                    cell(item.availableUnAssigned.toString()),
+                    cell(item.guestEntered.toString()),
+                    cell(item.availableCount.toString()),
+                    cell(item.eventDate.toLocal().toString().split(' ')[0]),
                     DataCell(
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -108,7 +110,9 @@ class EventsTableCard extends StatelessWidget {
                                           const SizedBox(height: 16),
                                           const Text(
                                             'Selecciona el formato de impresión:',
-                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -358,7 +362,7 @@ class EventsTableCard extends StatelessWidget {
     });
   }
 
-  DataCell cell(dynamic value, BuildContext context) {
+  DataCell cell(dynamic value) {
     return cellDataTable(value, context: context);
   }
 }

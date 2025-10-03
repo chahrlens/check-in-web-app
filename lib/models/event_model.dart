@@ -7,6 +7,8 @@ class EventModel {
   final String name;
   final String description;
   final int totalSpaces;
+  final int totalReservations;
+  final int totalFamilies;
   final int guestEntered;
   final DateTime eventDate;
   final int status;
@@ -23,6 +25,8 @@ class EventModel {
     required this.name,
     required this.description,
     required this.totalSpaces,
+    this.totalReservations = 0,
+    this.totalFamilies = 0,
     required this.guestEntered,
     required this.eventDate,
     required this.status,
@@ -45,13 +49,16 @@ class EventModel {
               .map((e) => Reservation.fromJson(e))
               .toList()
         : [];
+    final Map statics = json['statistics']?["summary"] ?? {};
     return EventModel(
       id: json['id'],
       hostId: json['host_id'],
       name: json['name'],
       description: json['description'] ?? '',
       totalSpaces: json['total_spaces'] ?? 0,
-      guestEntered: json['companionsEntered'] ?? 0,
+      guestEntered: statics['totalCheckedIn'] ?? 0,
+      totalReservations: statics['totalReservation'] ?? 0,
+      totalFamilies: statics['totalFamilies'] ?? 0,
       eventDate: DateTime.parse(json['event_date']),
       status: json['status'] ?? 0,
       createdAt: DateTime.parse(json['created_at']),
@@ -105,8 +112,7 @@ class EventModel {
   }
 
   int get tableCount => eventTables.length;
-  int get reservationCount =>
-      reservations.fold(0, (sum, r) => sum + r.numCompanions);
+  int get reservationCount => totalReservations;
   int get availableUnAssigned => totalSpaces - reservationCount;
   int get availableCount => reservationCount - guestEntered;
 }
@@ -338,16 +344,18 @@ class EventReservation {
           status: family.status,
           createdAt: family.createdAt,
           updatedAt: family.updatedAt,
-          familyTables: tableIds.map((tableId) =>
-            FamilyTable(
-              id: 0,
-              familyId: family.id,
-              tableId: tableId,
-              status: 1,
-              createdAt: DateTime.now(),
-              updatedAt: null,
-            )
-          ).toList(),
+          familyTables: tableIds
+              .map(
+                (tableId) => FamilyTable(
+                  id: 0,
+                  familyId: family.id,
+                  tableId: tableId,
+                  status: 1,
+                  createdAt: DateTime.now(),
+                  updatedAt: null,
+                ),
+              )
+              .toList(),
         );
       }
     } else {
@@ -567,7 +575,7 @@ class Statistics {
   factory Statistics.fromJson(Map<String, dynamic> json) {
     return Statistics(
       summary: Summary.fromJson(json['summary']),
-      details: Details.fromJson(json['details']),
+      details: Details.fromJson(json['details'] ?? {}),
     );
   }
 }
