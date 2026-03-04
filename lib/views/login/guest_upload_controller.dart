@@ -42,7 +42,7 @@ class GuestUploadController extends GetxController {
       totalCapacity.text =
           selectedEvent?.statistics?.summary.totalCapacity.toString() ?? '';
       availableSpaces.text =
-          selectedEvent?.statistics?.summary.availableSpaces.toString() ?? '';
+          selectedEvent?.statistics?.summary.tableAvailableSpaces.toString() ?? '';
       debugLog('Evento seleccionado para carga masiva: ${selectedEvent!.name}');
     }
   }

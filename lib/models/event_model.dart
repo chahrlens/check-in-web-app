@@ -573,33 +573,51 @@ class Statistics {
 }
 
 class Summary {
+  final int eventSpaces;
   final int totalGuests;
   final int totalCheckedIn;
   final int totalFamilies;
   final int totalTables;
   final int totalCapacity;
-  final int availableSpaces;
+  final int tableAvailableSpaces;
+  final int unCheckIcedSpaces;
+  final int uncoveredSpaces;
+  final int totalReservations;
+  final int unReservedSpaces;
   final String occupancyRate;
+  final int eventAvailableSpaces;
 
   Summary({
+    required this.eventSpaces,
     required this.totalGuests,
     required this.totalCheckedIn,
     required this.totalFamilies,
     required this.totalTables,
     required this.totalCapacity,
-    required this.availableSpaces,
+    required this.tableAvailableSpaces,
+    required this.unCheckIcedSpaces,
+    required this.uncoveredSpaces,
+    required this.totalReservations,
+    required this.unReservedSpaces,
     required this.occupancyRate,
+    required this.eventAvailableSpaces,
   });
 
   factory Summary.fromJson(Map<String, dynamic> json) {
     return Summary(
+      eventSpaces: json['eventSpaces'] ?? 0,
       totalGuests: json['totalGuests'] ?? 0,
       totalCheckedIn: json['totalCheckedIn'] ?? 0,
       totalFamilies: json['totalFamilies'] ?? 0,
       totalTables: json['totalTables'] ?? 0,
-      totalCapacity: json['totalCapacity'] ?? 0,
-      availableSpaces: json['availableSpaces'] ?? 0,
+      totalCapacity: json['tableTotalCapacity'] ?? 0,
+      tableAvailableSpaces: json['tableAvailableSpaces'] ?? 0,
+      unCheckIcedSpaces: json['unChecked'] ?? 0,
+      uncoveredSpaces: json['uncoveredSpaces'] ?? 0,
+      totalReservations: json['totalReservations'] ?? 0,
+      unReservedSpaces: json['unReservedSpaces'] ?? 0,
       occupancyRate: json['occupancyRate'] ?? '',
+      eventAvailableSpaces: json['eventAvailableSpaces'] ?? 0,
     );
   }
 }

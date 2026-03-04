@@ -19,12 +19,13 @@ class EventsTableCard extends StatelessWidget {
         return const Center(child: CircularProgressIndicator());
       }
       return CustomDataTableWidgetV2(
+        minWidth: 1500,
         columnSizes: <ColumnSize>[
           ColumnSize.S,
           ColumnSize.L,
           ColumnSize.M,
           ColumnSize.S,
-          ColumnSize.S,
+          ColumnSize.M,
           ColumnSize.S,
           ColumnSize.S,
           ColumnSize.S,
@@ -41,7 +42,7 @@ class EventsTableCard extends StatelessWidget {
           'Total Reservaciones',
           'Total sin reservar',
           'Ingresados',
-          'Disponibles',
+          'Sin ingresar',
           'Fecha',
           'Acciones',
         ],
@@ -56,11 +57,11 @@ class EventsTableCard extends StatelessWidget {
                     cell(item.host.fullName, context),
                     cell(item.description, context),
                     cell(item.totalSpaces.toString(), context),
-                    cell(item.tableCount.toString(), context),
-                    cell(item.reservationCount.toString(), context),
-                    cell(item.availableUnAssigned.toString(), context),
-                    cell(item.guestEntered.toString(), context),
-                    cell(item.availableCount.toString(), context),
+                    cell('${item.tableCount} mesas (${item.statistics?.summary.totalCapacity ?? 0} espacios)', context),
+                    cell('${item.statistics?.summary.totalReservations ?? 0}', context),
+                    cell('${item.statistics?.summary.unReservedSpaces ?? 0}', context),
+                    cell('${item.statistics?.summary.totalCheckedIn ?? 0}', context),
+                    cell('${item.statistics?.summary.unCheckIcedSpaces ?? 0}', context),
                     cell(
                       item.eventDate.toLocal().toString().split(' ')[0],
                       context,
