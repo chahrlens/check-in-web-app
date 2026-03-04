@@ -42,7 +42,6 @@ ios/build/
 web/.dart_tool/
 web/build/
 
-
 # Symbol files
 *.symbols
 
@@ -50,7 +49,6 @@ web/build/
 *.log
 *.lock
 *.tmp
-.fvm/flutter.version
 .firebase/hosting.YnVpbGQvd2Vi.cache
 macos/Flutter/GeneratedPluginRegistrant.swift
 macos/Flutter/GeneratedPluginRegistrant.swift
@@ -58,3 +56,6 @@ macos/Flutter/GeneratedPluginRegistrant.swift
 
 # Firebase configuration
 lib/config/firebase_options.dart
+
+# FVM Version Cache
+.fvm/

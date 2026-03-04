@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:qr_check_in/models/either.dart';
+import 'package:qr_check_in/models/guest_model.dart';
 import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/models/api_response.dart';
-import 'package:qr_check_in/models/guest_model.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
 import 'package:qr_check_in/models/check_in_model.dart';
 import 'package:qr_check_in/services/base_service.dart';
+import 'package:qr_check_in/shared/constants/event_endpoints.dart';
 
 class CheckInService extends BaseService {
   final SessionController _sessionController = Get.find<SessionController>();
@@ -24,7 +25,7 @@ class CheckInService extends BaseService {
   ) async {
     try {
       final response = await httpClient.get(
-        buildUri('/check-in/v1/availability/$uuid'),
+        buildUri(EventEndpoints.checkInAvailability(uuid)),
         headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
@@ -59,7 +60,7 @@ class CheckInService extends BaseService {
         'guestEntered': guestEntered,
       };
       final response = await httpClient.post(
-        buildUri('/check-in/v1/check-in'),
+        buildUri(EventEndpoints.checkIn),
         body: json.encode(body),
         headers: _authHeaders,
       );
@@ -78,7 +79,7 @@ class CheckInService extends BaseService {
   Future<Either<Guest?, ApiResponse>> getGuestByUuid(String uuid) async {
     try {
       final response = await httpClient.get(
-        buildUri('/check-in/v1/person/$uuid'),
+        buildUri(EventEndpoints.person(uuid)),
         headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
@@ -112,7 +113,7 @@ class CheckInService extends BaseService {
       }
       final jsonData = json.encode(guest.toJson());
       final response = await httpClient.put(
-        buildUri('/check-in/v1/person/${guest.id}'),
+        buildUri(EventEndpoints.updatePerson(guest.id)),
         body: jsonData,
         headers: _authHeaders,
       );

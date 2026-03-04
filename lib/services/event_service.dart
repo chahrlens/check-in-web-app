@@ -3,12 +3,13 @@ import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_check_in/models/either.dart';
-import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/models/event_model.dart';
-import 'package:qr_check_in/models/api_response.dart';
 import 'package:qr_check_in/models/guest_model.dart';
+import 'package:qr_check_in/models/api_response.dart';
+import 'package:qr_check_in/controllers/globals.dart';
 import 'package:qr_check_in/services/base_service.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
+import 'package:qr_check_in/shared/constants/event_endpoints.dart';
 
 class EventService extends BaseService {
   final SessionController _sessionController = Get.find<SessionController>();
@@ -23,7 +24,7 @@ class EventService extends BaseService {
   Future<Either<List<EventModel>?, ApiResponse>> getEvents() async {
     try {
       final response = await httpClient.get(
-        buildUri('/event/v1/events'),
+        buildUri(EventEndpoints.events),
         headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
@@ -51,7 +52,7 @@ class EventService extends BaseService {
     try {
       final body = data.toJson();
       final response = await httpClient.post(
-        buildUri('/event/v1/events'),
+        buildUri(EventEndpoints.events),
         body: json.encode(body),
         headers: _authHeaders,
       );
@@ -72,7 +73,7 @@ class EventService extends BaseService {
     try {
       final body = data.toPutJson();
       final response = await httpClient.put(
-        buildUri('/event/v1/events'),
+        buildUri(EventEndpoints.events),
         body: json.encode(body),
         headers: _authHeaders,
       );
@@ -98,7 +99,7 @@ class EventService extends BaseService {
         "tablesData": data.map((e) => e.toJson()).toList(),
       };
       final response = await httpClient.post(
-        buildUri('/event/v1/events/tables'),
+        buildUri(EventEndpoints.eventTables),
         body: json.encode(jsonData),
         headers: _authHeaders,
       );
@@ -119,7 +120,7 @@ class EventService extends BaseService {
       final data = reservations.toJson();
       debugLog('Reservation Data: $data');
       final response = await httpClient.post(
-        buildUri('/event/v1/events/reservations'),
+        buildUri(EventEndpoints.eventReservations),
         body: json.encode(data),
         headers: _authHeaders,
       );
@@ -140,7 +141,7 @@ class EventService extends BaseService {
       final data = reservations.map((e) => e.toJson()).toList();
       debugLog('Bulk Reservation Data: $data');
       final response = await httpClient.post(
-        buildUri('/event/v1/events/reservations-members-bulk'),
+        buildUri(EventEndpoints.reservationsMembersBulk),
         body: json.encode(data),
         headers: _authHeaders,
       );
@@ -158,7 +159,7 @@ class EventService extends BaseService {
   Future<ApiResponse> deleteEvent(int eventId) async {
     try {
       final response = await httpClient.delete(
-        buildUri('/event/v1/events/', queryParameters: {"eventId": eventId}),
+        buildUri(EventEndpoints.deleteEvent(eventId: eventId), queryParameters: {"eventId": eventId}),
         headers: _authHeaders,
       );
       return ApiResponse.fromResponse(response);
@@ -175,7 +176,7 @@ class EventService extends BaseService {
   Future<ApiResponse> deleteReservations(List<int> reservationIds) async {
     try {
       final response = await httpClient.delete(
-        buildUri('/event/v1/events/reservations'),
+        buildUri(EventEndpoints.eventReservations),
         body: json.encode({"reservationIds": reservationIds}),
         headers: _authHeaders,
       );
@@ -193,7 +194,7 @@ class EventService extends BaseService {
   Future<Either<List<Family>?, ApiResponse>> getFamilies() async {
     try {
       final response = await httpClient.get(
-        buildUri('/event/v1/events/families'),
+        buildUri(EventEndpoints.families),
         headers: _authHeaders,
       );
       final apiResponse = ApiResponse.fromResponse(response);
@@ -221,7 +222,7 @@ class EventService extends BaseService {
     try {
       final response = await httpClient.delete(
         buildUri(
-          '/event/v1/events/families',
+          EventEndpoints.families,
           queryParameters: {"familyId": familyId},
         ),
         headers: _authHeaders,
@@ -244,7 +245,7 @@ class EventService extends BaseService {
     try {
       final response = await httpClient.get(
         buildUri(
-          '/event/v1/events/tables',
+          EventEndpoints.eventTables,
           queryParameters: {
             "eventId": eventId,
             "filterAvailable": filterAvailable,
@@ -285,7 +286,7 @@ class EventService extends BaseService {
         "additionalTables": additionalTables,
       };
       final response = await httpClient.put(
-        buildUri('/event/v1/events/reservations-members'),
+        buildUri(EventEndpoints.reservationsMembers),
         body: json.encode(body),
         headers: _authHeaders,
       );
@@ -306,7 +307,7 @@ class EventService extends BaseService {
     required String fileName,
   }) async {
     try {
-      var uri = buildUri('/event/v1/events/guest-upload/$eventId');
+      var uri = buildUri(EventEndpoints.guestUpload(eventId));
       var request = http.MultipartRequest('POST', uri);
 
       request.headers.addAll(_authHeaders);
