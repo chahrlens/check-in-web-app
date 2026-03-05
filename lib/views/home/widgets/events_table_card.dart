@@ -1,11 +1,10 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:qr_check_in/services/qr_print_service.dart';
+import 'package:qr_check_in/views/home/widgets/print_modal.dart';
 import 'package:qr_check_in/shared/resources/get_routes/routes.dart';
 import 'package:qr_check_in/widgets/datatable/common_data_table.dart';
 import 'package:qr_check_in/views/home/controllers/home_controller.dart';
-import 'package:qr_check_in/views/home/widgets/printing_instructions.dart';
 import 'package:qr_check_in/widgets/datatable/custom_data_table_widget_v2.dart';
 
 class EventsTableCard extends StatelessWidget {
@@ -57,11 +56,26 @@ class EventsTableCard extends StatelessWidget {
                     cell(item.host.fullName, context),
                     cell(item.description, context),
                     cell(item.totalSpaces.toString(), context),
-                    cell('${item.tableCount} mesas (${item.statistics?.summary.totalCapacity ?? 0} espacios)', context),
-                    cell('${item.statistics?.summary.totalReservations ?? 0}', context),
-                    cell('${item.statistics?.summary.unReservedSpaces ?? 0}', context),
-                    cell('${item.statistics?.summary.totalCheckedIn ?? 0}', context),
-                    cell('${item.statistics?.summary.unCheckIcedSpaces ?? 0}', context),
+                    cell(
+                      '${item.tableCount} mesas (${item.statistics?.summary.totalCapacity ?? 0} espacios)',
+                      context,
+                    ),
+                    cell(
+                      '${item.statistics?.summary.totalReservations ?? 0}',
+                      context,
+                    ),
+                    cell(
+                      '${item.statistics?.summary.unReservedSpaces ?? 0}',
+                      context,
+                    ),
+                    cell(
+                      '${item.statistics?.summary.totalCheckedIn ?? 0}',
+                      context,
+                    ),
+                    cell(
+                      '${item.statistics?.summary.unCheckIcedSpaces ?? 0}',
+                      context,
+                    ),
                     cell(
                       item.eventDate.toLocal().toString().split(' ')[0],
                       context,
@@ -98,79 +112,7 @@ class EventsTableCard extends StatelessWidget {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text(
-                                        'Instrucciones de Impresión',
-                                      ),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          PrintingInstructions(),
-                                          const SizedBox(height: 16),
-                                          const Text(
-                                            'Selecciona el formato de impresión:',
-                                            style: TextStyle(fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          style: ButtonStyle(
-                                            foregroundColor:
-                                                WidgetStateProperty.all<Color>(
-                                                  Colors.grey,
-                                                ),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Cancelar'),
-                                        ),
-                                        ElevatedButton(
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStateProperty.all<Color>(
-                                                  Colors.blue,
-                                                ),
-                                            foregroundColor:
-                                                WidgetStateProperty.all<Color>(
-                                                  Colors.white,
-                                                ),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            QRPrintService.openPrintWindow(
-                                              item,
-                                            );
-                                          },
-                                          child: const Text(
-                                            'Imprimir 2 por página',
-                                          ),
-                                        ),
-                                        ElevatedButton(
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStateProperty.all<Color>(
-                                                  Colors.green,
-                                                ),
-                                            foregroundColor:
-                                                WidgetStateProperty.all<Color>(
-                                                  Colors.white,
-                                                ),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            QRPrintService.openPrintWindow(
-                                              item,
-                                              verticalFormat: true,
-                                            );
-                                          },
-                                          child: const Text(
-                                            'Imprimir 1 por página',
-                                          ),
-                                        ),
-                                      ],
-                                    );
+                                    return PrintModal(eventData: item);
                                   },
                                 );
                               },

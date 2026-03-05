@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 import 'package:qr_check_in/models/event_model.dart';
-import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/shared/utils/loggers.dart';
+import 'package:qr_check_in/services/toast_service.dart';
 import 'package:qr_check_in/services/event_service.dart';
 
 class HomeController extends GetxController {
@@ -11,6 +11,8 @@ class HomeController extends GetxController {
   RxBool isLoading = false.obs;
 
   final searchCtrl = TextEditingController();
+
+  RxBool printBackground = true.obs;
 
   Future<void> fetchEvents() async {
     try {

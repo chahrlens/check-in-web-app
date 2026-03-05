@@ -24,9 +24,15 @@ class QRPrintService {
   }
 
   // Método para imprimir en formato horizontal (2 tarjetas por página)
-  static void openPrintWindow(EventModel event, {bool verticalFormat = false}) {
+  static void openPrintWindow(EventModel event, {bool verticalFormat = false, bool showBackground = true}) {
     if (verticalFormat) {
-      openVerticalPrintWindow(event);
+      openVerticalPrintWindow(event, showBackground: showBackground);
+      return;
+    }
+
+    // Si no hay fondo, usar formato simple
+    if (!showBackground) {
+      _openSimplePrintWindow(event, vertical: false);
       return;
     }
     // Función auxiliar para encontrar el número de mesa de un invitado
@@ -359,7 +365,12 @@ class QRPrintService {
   }
 
   // Método para imprimir en formato vertical (1 tarjeta por página)
-  static void openVerticalPrintWindow(EventModel event) {
+  static void openVerticalPrintWindow(EventModel event, {bool showBackground = true}) {
+    // Si no hay fondo, usar formato simple
+    if (!showBackground) {
+      _openSimplePrintWindow(event, vertical: true);
+      return;
+    }
     // Función auxiliar para encontrar el número de mesa de un invitado
     int? findTableNumber(String uuid) {
       for (var reservation in event.reservations) {
@@ -635,6 +646,126 @@ class QRPrintService {
     html.window.open(
       url,
       'QR Codes Vertical - ${event.name}',
+      'width=800,height=600,toolbar=no,location=no,status=no,menubar=no',
+    );
+
+    // Liberar el URL del objeto después de un momento
+    Future.delayed(const Duration(seconds: 1), () {
+      html.Url.revokeObjectUrl(url);
+    });
+  }
+
+  // Método para imprimir formato simple (solo QR y nombre)
+  static void _openSimplePrintWindow(EventModel event, {required bool vertical}) {
+    // Función para generar las páginas simples
+    String generateSimplePages(List<ReservationMember> members, bool isVertical) {
+      final buffer = StringBuffer();
+      final itemsPerPage = isVertical ? 1 : 2;
+
+      for (var i = 0; i < members.length; i += itemsPerPage) {
+        buffer.write('<div class="page-container">');
+
+        for (var j = 0; j < itemsPerPage && (i + j) < members.length; j++) {
+          final member = members[i + j];
+          buffer.write('''
+            <div class="simple-card">
+              <img class="simple-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${Uri.encodeComponent(member.uuidCode)}"/>
+              <div class="simple-name">${_escapeHtml(member.member.fullName)}</div>
+            </div>
+          ''');
+        }
+
+        buffer.write('</div>');
+      }
+
+      return buffer.toString();
+    }
+
+    final orientation = vertical ? 'portrait' : 'landscape';
+    final pageHeight = vertical ? '10.5in' : 'auto';
+
+    final htmlContent = '''
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>QR Codes Simple - ${_escapeHtml(event.name)}</title>
+          <style>
+            @page {
+              size: letter $orientation;
+              margin: 0.5in;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 10px;
+              background: white;
+            }
+            .container {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              margin: 0 auto;
+            }
+            .page-container {
+              display: flex;
+              justify-content: ${vertical ? 'center' : 'space-around'};
+              align-items: center;
+              width: 100%;
+              height: $pageHeight;
+              page-break-after: always;
+              page-break-inside: avoid;
+              margin-bottom: 20px;
+            }
+            .simple-card {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+            }
+            .simple-qr {
+              width: ${vertical ? '300px' : '250px'};
+              height: ${vertical ? '300px' : '250px'};
+              margin-bottom: 15px;
+            }
+            .simple-name {
+              font-size: ${vertical ? '24px' : '20px'};
+              font-weight: 600;
+              color: #333;
+              text-align: center;
+              max-width: 350px;
+            }
+            @media print {
+              .no-print {
+                display: none;
+              }
+              body {
+                padding: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom: 20px; text-align: center;">
+            <button onclick="window.print()">Imprimir QRs</button>
+            <button onclick="window.close()">Cerrar</button>
+          </div>
+          <div class="container">
+            ${generateSimplePages(event.reservations.expand((re) => re.reservationMembers).toList(), vertical)}
+          </div>
+        </body>
+      </html>
+    ''';
+
+    // Crear un Blob con el contenido HTML
+    final blob = html.Blob([htmlContent], 'text/html');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+
+    // Abrir nueva ventana con el contenido
+    html.window.open(
+      url,
+      'QR Codes Simple - ${event.name}',
       'width=800,height=600,toolbar=no,location=no,status=no,menubar=no',
     );
 

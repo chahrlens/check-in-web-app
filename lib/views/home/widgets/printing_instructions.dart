@@ -1,10 +1,15 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_check_in/views/home/controllers/home_controller.dart';
 
 class PrintingInstructions extends StatelessWidget {
   const PrintingInstructions({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final HomeController controller = Get.find<HomeController>();
+    controller.printBackground.value =
+        true; // Reset a el estado al abrir el modal
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -46,6 +51,41 @@ class PrintingInstructions extends StatelessWidget {
           const Text(
             'Nota: Cada página mostrará 2 invitaciones correctamente formateadas.',
             style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              const Text(
+                '¿Desea imprimir con fondo?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+
+              Obx(
+                () => Column(
+                  children: [
+                    Text(
+                      controller.printBackground.value ? 'Sí' : 'No',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: controller.printBackground.value
+                            ? Colors.green
+                            : Colors.red,
+                      ),
+                    ),
+                    Switch(
+                      value: controller.printBackground.value,
+                      onChanged: (value) {
+                        controller.printBackground.value = value;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
