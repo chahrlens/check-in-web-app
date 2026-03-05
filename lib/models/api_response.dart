@@ -12,7 +12,7 @@ class ApiResponse {
     return ApiResponse(
       statusCode: response.statusCode,
       success: decodeJson['success'] ?? false,
-      message: decodeJson['message'] ?? '',
+      message: decodeJson['message'] ?? decodeJson['error'] ?? 'Unknown error',
     );
   }
 }
