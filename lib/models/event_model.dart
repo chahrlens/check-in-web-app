@@ -547,11 +547,11 @@ class ReservationMember {
   String get attendanceStatusLabel {
     switch (attendanceStatus) {
       case 'PENDING':
-        return 'Pendiente';
+        return 'No Ingresado';
       case 'USED':
-        return 'Confirmado';
+        return 'Ingresado';
       case 'CANCELLED':
-        return 'Cancelado';
+        return 'Anulado';
       default:
         return 'Desconocido';
     }

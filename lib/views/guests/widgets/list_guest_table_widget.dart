@@ -20,8 +20,8 @@ class _ListGuestTableWidgetState extends State<ListGuestTableWidget> {
         child: CustomDataTableWidgetV2(
           tableHeaders: const <String>[
             'Código',
-            'Mesa',
             'Familia',
+            'Mesa',
             'Invitado principal',
             'Dpi principal',
             'Invitado',
